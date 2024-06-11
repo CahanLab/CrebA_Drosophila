@@ -35,7 +35,7 @@ DimPlot(wt_object, group.by = 'new_celltypes', label = TRUE) +
   ggtitle("Stage 10-12 Wildtype Embryos")
 ggsave(file.path(TARGET_dir, "stage10-12_wt_embryos_umap.png"), width = 12, height = 8)
 
-DimPlot(crebA_object, group.by = 'new_celltypes', label = FALSE) + 
+DimPlot(wt_object, group.by = 'new_celltypes', label = FALSE) + 
   scale_color_manual(values =color_palette) + 
   ggtitle("Stage 10-12 Wildtype Embryos")
 ggsave(file.path(TARGET_dir, "stage10-12_wt_embryos_umap_unlabeled.png"), width = 12, height = 8)

@@ -29,3 +29,5 @@ cellbender_background_removal/*
 Meetings/*
 
 manuscript/* 
+
+analysis/.Rprofile
