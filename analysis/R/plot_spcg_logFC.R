@@ -1,0 +1,113 @@
+TARGET_dir = file.path("results", ANALYSIS_VERSION, "Figures/plot_spcg_logFC")
+dir.create(TARGET_dir)
+
+##### load in the spcgs #####
+spcg_tab = readxl::read_excel("accessory_data/SPCG_files/SPCG List.xlsx")
+spcg_tab = as.data.frame(spcg_tab)
+for(i in seq(1, nrow(spcg_tab))) {
+  if(is.na(spcg_tab[i, 'SPCG General Functional Categories']) == TRUE) {
+    spcg_tab[i, 'SPCG General Functional Categories'] = spcg_tab[i - 1, 'SPCG General Functional Categories'] 
+  }
+}
+
+# convert all the flybase name into the genes in seurat 
+wt_object = readRDS(file.path("results", ANALYSIS_VERSION, "harmonized_wildtype_data", 'stage10-12_reharmonized_seurat.rds'))
+flybase_map = rownames(wt_object)
+spcg_tab$seurat_genes = NA
+for(i in rownames(spcg_tab)) {
+  spcg_tab[i, 'seurat_genes'] = flybase_map[spcg_tab[i, "Drosophila FBgn"]]
+}
+spcg_tab = spcg_tab[is.na(spcg_tab$seurat_genes) == FALSE, ]
+spcg_tab = spcg_tab[rownames(spcg_tab) != 45, ]
+rownames(spcg_tab) = spcg_tab$seurat_genes
+
+
+##### load and compile the early data #####
+plot_df = data.frame()
+ct_list = list.dirs(file.path('results', ANALYSIS_VERSION, 'DE_genes_early_crebA_wt'), full.names = FALSE, recursive = FALSE)
+for(tmp_ct in ct_list) {
+  mut_DE_genes = read.csv(file.path('results', ANALYSIS_VERSION, 'DE_genes_early_crebA_wt', tmp_ct, 'mut_DE_genes.csv'), row.names = 1)
+  rownames(mut_DE_genes) = mut_DE_genes$feature
+  mut_DE_genes = mut_DE_genes[mut_DE_genes$feature %in% spcg_tab$seurat_genes, ]
+  mut_DE_genes$celltype = tmp_ct
+  mut_DE_genes$spcg_cat = spcg_tab[mut_DE_genes$feature, "SPCG General Functional Categories"]
+  plot_df = rbind(plot_df, mut_DE_genes)
+}
+
+sub_exp_order = plot_df %>% 
+  group_by(celltype) %>%
+  summarize(sum_logfc = sum(logFC))
+sub_exp_order = sub_exp_order[order(sub_exp_order$sum_logfc, decreasing = TRUE), ]
+
+plot_df$celltype = factor(plot_df$celltype, levels = sub_exp_order$celltype)
+plot_df$spcg_cat = factor(plot_df$spcg_cat, levels = unique(spcg_tab$`SPCG General Functional Categories`))
+plot_df = plot_df[plot_df$spcg_cat != 'Prolyl hydroxylation', ]
+
+p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', fill = 'logFC')) +
+  geom_tile() +
+  guides(fill = guide_colorbar(title = 'logFC')) +
+  scale_fill_gradient2(low = scales::muted("red"), mid = "white", high = scales::muted("blue"), 
+                        midpoint = 0, limits = c(-1.6, 0.5)) +
+  labs(
+    x = 'Secretory Pathway Component Genes',
+    y = 'Cell Types'
+  ) + 
+  facet_grid(
+    cols = vars(spcg_cat),
+    scales = "free_x",
+    space = "free_x",
+    switch = "y"
+  ) + 
+  theme(
+    panel.spacing = unit(x = 1, units = "lines"),
+    strip.background = element_blank()
+  ) + 
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), axis.text = element_text(size=15), text = element_text(size = 15)) +
+  ggtitle("Stage 10-12 Embryos")
+ggsave(filename = file.path(TARGET_dir, "stage10-12_logFC.png"), plot = p, width = 31, height = 7)
+
+##### load and compile the late data #####
+plot_df = data.frame()
+ct_list = list.dirs(file.path('results', ANALYSIS_VERSION, 'DE_genes_crebA_wt'), full.names = FALSE, recursive = FALSE)
+for(tmp_ct in ct_list) {
+  mut_DE_genes = read.csv(file.path('results', ANALYSIS_VERSION, 'DE_genes_crebA_wt', tmp_ct, 'mut_DE_genes.csv'), row.names = 1)
+  rownames(mut_DE_genes) = mut_DE_genes$feature
+  mut_DE_genes = mut_DE_genes[mut_DE_genes$feature %in% spcg_tab$seurat_genes, ]
+  mut_DE_genes$celltype = tmp_ct
+  mut_DE_genes$spcg_cat = spcg_tab[mut_DE_genes$feature, "SPCG General Functional Categories"]
+  plot_df = rbind(plot_df, mut_DE_genes)
+}
+
+
+sub_exp_order = plot_df %>% 
+  group_by(celltype) %>%
+  summarize(sum_logfc = sum(logFC))
+sub_exp_order = sub_exp_order[order(sub_exp_order$sum_logfc, decreasing = TRUE), ]
+
+plot_df$celltype = factor(plot_df$celltype, levels = sub_exp_order$celltype)
+plot_df$spcg_cat = factor(plot_df$spcg_cat, levels = unique(spcg_tab$`SPCG General Functional Categories`))
+plot_df = plot_df[plot_df$spcg_cat != 'Prolyl hydroxylation', ]
+
+p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', fill = 'logFC')) +
+  geom_tile() +
+  guides(fill = guide_colorbar(title = 'logFC')) +
+  scale_fill_gradient2(low = scales::muted("red"), mid = "white", high = scales::muted("blue"), 
+                       midpoint = 0, limits = c(-1.6, 0.5)) +
+  labs(
+    x = 'Secretory Pathway Component Genes',
+    y = 'Cell Types'
+  ) + 
+  facet_grid(
+    cols = vars(spcg_cat),
+    scales = "free_x",
+    space = "free_x",
+    switch = "y"
+  ) + 
+  theme(
+    panel.spacing = unit(x = 1, units = "lines"),
+    strip.background = element_blank()
+  ) + 
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), axis.text = element_text(size=15), text = element_text(size = 15)) +
+  ggtitle("Stage 13-16 Embryos")
+ggsave(filename = file.path(TARGET_dir, "stage13-16_logFC.png"), plot = p, width = 31, height = 7)
+
