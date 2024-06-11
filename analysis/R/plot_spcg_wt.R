@@ -9,6 +9,22 @@ for(i in seq(1, nrow(spcg_tab))) {
   }
 }
 
+spcg_tab = spcg_tab[spcg_tab$`Drosophila Gene` %in% c('CG9356',
+                                                      'Cog1',
+                                                      'Cog2',
+                                                      'Cog3',
+                                                      'Cog6',
+                                                      'Cog7',
+                                                      'fws',
+                                                      'Osbp',
+                                                      'p24-2',
+                                                      'PH4alphaSG1',
+                                                      'rt',
+                                                      'Sec71',
+                                                      'Sil1', 
+                                                      'spas',
+                                                      'TBC1D23', 
+                                                      'tw') == FALSE, ]
 ##### load in the color palette ######
 color_palette = readRDS(file.path("results", ANALYSIS_VERSION, "ct_color_palettes", 'ct_color_palette.rds'))
 
@@ -26,7 +42,7 @@ for(i in rownames(spcg_tab)) {
 }
 spcg_tab = spcg_tab[is.na(spcg_tab$seurat_genes) == FALSE, ]
 
-# this is to reorder 
+# this is to reorder violin plots based on CrebA expression
 mean_expression = AverageExpression(wt_object, features = "CrebA", group.by = 'new_celltypes')$RNA[1, ]
 ordered_clusters = order(mean_expression, decreasing = TRUE)
 ordered_cluster_names = names(mean_expression)[ordered_clusters]
@@ -65,7 +81,7 @@ sub_crebA_exp = spcg_dot_df[spcg_dot_df$features.plot == 'CrebA', ]
 sub_crebA_exp = sub_crebA_exp[order(sub_crebA_exp$avg.exp.scaled), ]
 
 spcg_dot_df$id = factor(spcg_dot_df$id, levels = sub_crebA_exp$id)
-spcg_dot_df$category = factor(spcg_dot_df$category, levels = unique(spcg_dot_df$category))
+spcg_dot_df$category = factor(spcg_dot_df$category, levels = c('CrebA', unique(spcg_dot_df$category)[unique(spcg_dot_df$category) != 'CrebA']))
 spcg_dot_df = spcg_dot_df[spcg_dot_df$category != 'Prolyl hydroxylation', ]
 
 # plot out the dot plot 
@@ -89,9 +105,12 @@ p <- ggplot(data = spcg_dot_df, mapping = aes_string(y = 'id', x = 'features.plo
     panel.spacing = unit(x = 1, units = "lines"),
     strip.background = element_blank()
   ) + 
-  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), axis.text = element_text(size=15), text = element_text(size = 15)) +
+  theme(strip.text.x = element_blank(), 
+        axis.text.x=element_text(angle=45, vjust = 1, hjust=1), 
+        axis.text = element_text(size=17), text = element_text(size = 17), 
+        legend.position = 'bottom') +
   ggtitle("Stage 10-12 Embryos")
-ggsave(filename = file.path(TARGET_dir, subfolder_path, "spcg_dot_scaled.png"), plot = p, width = 31, height = 7)
+ggsave(filename = file.path(TARGET_dir, subfolder_path, "spcg_dot_scaled.png"), plot = p, width = 31, height = 10)
 
 # plot out the unscaled version 
 p <- ggplot(data = spcg_dot_df, mapping = aes_string(y = 'id', x = 'features.plot')) +
@@ -114,7 +133,9 @@ p <- ggplot(data = spcg_dot_df, mapping = aes_string(y = 'id', x = 'features.plo
     panel.spacing = unit(x = 1, units = "lines"),
     strip.background = element_blank()
   ) + 
-  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), axis.text = element_text(size=15), text = element_text(size = 15)) +
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), 
+        axis.text = element_text(size=15), text = element_text(size = 15), 
+        legend.position = 'bottom') +
   ggtitle("Stage 10-12 Embryos")
 ggsave(filename = file.path(TARGET_dir, subfolder_path, "spcg_dot_norm_exp.png"), plot = p, width = 31, height = 7)
 
@@ -131,6 +152,14 @@ for(i in rownames(spcg_tab)) {
   spcg_tab[i, 'seurat_genes'] = flybase_map[spcg_tab[i, "Drosophila FBgn"]]
 }
 spcg_tab = spcg_tab[is.na(spcg_tab$seurat_genes) == FALSE, ]
+
+# this is to reorder violin plots based on CrebA expression
+mean_expression = AverageExpression(wt_object, features = "CrebA", group.by = 'new_celltypes')$RNA[1, ]
+ordered_clusters = order(mean_expression, decreasing = TRUE)
+ordered_cluster_names = names(mean_expression)[ordered_clusters]
+
+# Create a new factor level with the ordered clusters
+wt_object$new_celltypes = factor(wt_object$new_celltypes, levels = ordered_cluster_names)
 
 # this is to plot the violin plots 
 for(gene_id in c(spcg_tab$seurat_genes, 'CrebA')) {
@@ -186,7 +215,9 @@ p <- ggplot(data = spcg_dot_df, mapping = aes_string(y = 'id', x = 'features.plo
     panel.spacing = unit(x = 1, units = "lines"),
     strip.background = element_blank()
   ) + 
-  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), axis.text = element_text(size=15), text = element_text(size = 15)) +
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), 
+        axis.text = element_text(size=15), text = element_text(size = 15), 
+        legend.position = 'bottom') +
   ggtitle("Stage 13-16 Embryos")
 ggsave(filename = file.path(TARGET_dir, subfolder_path, "spcg_dot_scaled.png"), plot = p, width = 32, height = 8)
 
@@ -211,6 +242,8 @@ p <- ggplot(data = spcg_dot_df, mapping = aes_string(y = 'id', x = 'features.plo
     panel.spacing = unit(x = 1, units = "lines"),
     strip.background = element_blank()
   ) + 
-  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), axis.text = element_text(size=15), text = element_text(size = 15)) +
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), 
+        axis.text = element_text(size=15), text = element_text(size = 15), 
+        legend.position = 'bottom') +
   ggtitle("Stage 13-16 Embryos")
 ggsave(filename = file.path(TARGET_dir, subfolder_path, "spcg_dot_norm_exp.png"), plot = p, width = 32, height = 8)

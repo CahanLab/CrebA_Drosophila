@@ -69,6 +69,9 @@ source("R/manual_label_crebA.R")
 # find DE genes between the same cell types 
 source("R/DE_genes_crebA_wt.R")
 
+
+##### make the plotting scripts ######
+
 # make the color palette 
 source("R/create_color_palette.R")
 

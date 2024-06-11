@@ -10,6 +10,23 @@ for(i in seq(1, nrow(spcg_tab))) {
   }
 }
 
+spcg_tab = spcg_tab[spcg_tab$`Drosophila Gene` %in% c('CG9356',
+                                                      'Cog1',
+                                                      'Cog2',
+                                                      'Cog3',
+                                                      'Cog6',
+                                                      'Cog7',
+                                                      'fws',
+                                                      'Osbp',
+                                                      'p24-2',
+                                                      'PH4alphaSG1',
+                                                      'rt',
+                                                      'Sec71',
+                                                      'Sil1', 
+                                                      'spas',
+                                                      'TBC1D23', 
+                                                      'tw') == FALSE, ]
+
 # convert all the flybase name into the genes in seurat 
 wt_object = readRDS(file.path("results", ANALYSIS_VERSION, "harmonized_wildtype_data", 'stage10-12_reharmonized_seurat.rds'))
 flybase_map = rownames(wt_object)
@@ -18,9 +35,19 @@ for(i in rownames(spcg_tab)) {
   spcg_tab[i, 'seurat_genes'] = flybase_map[spcg_tab[i, "Drosophila FBgn"]]
 }
 spcg_tab = spcg_tab[is.na(spcg_tab$seurat_genes) == FALSE, ]
-spcg_tab = spcg_tab[rownames(spcg_tab) != 45, ]
-rownames(spcg_tab) = spcg_tab$seurat_genes
 
+
+new_row <- data.frame(
+  "SPCG General Functional Categories" = "CrebA",
+  "Drosophila Gene" = "CrebA",
+  "Drosophila FBgn" = "CrebA",
+  "seurat_genes" = 'CrebA', 
+  check.names = FALSE
+)
+
+# Add the new row to the existing data frame
+spcg_tab <- rbind(spcg_tab, new_row)
+rownames(spcg_tab) = spcg_tab$seurat_genes
 
 ##### load and compile the early data #####
 plot_df = data.frame()
@@ -34,13 +61,11 @@ for(tmp_ct in ct_list) {
   plot_df = rbind(plot_df, mut_DE_genes)
 }
 
-sub_exp_order = plot_df %>% 
-  group_by(celltype) %>%
-  summarize(sum_logfc = sum(logFC))
-sub_exp_order = sub_exp_order[order(sub_exp_order$sum_logfc, decreasing = TRUE), ]
+sub_exp_order = plot_df[plot_df$feature == 'CrebA', ]
+sub_exp_order = sub_exp_order[order(sub_exp_order$logFC, decreasing = TRUE), ]
 
 plot_df$celltype = factor(plot_df$celltype, levels = sub_exp_order$celltype)
-plot_df$spcg_cat = factor(plot_df$spcg_cat, levels = unique(spcg_tab$`SPCG General Functional Categories`))
+plot_df$spcg_cat = factor(plot_df$spcg_cat, levels = c("CrebA", unique(spcg_tab$`SPCG General Functional Categories`)[unique(spcg_tab$`SPCG General Functional Categories`) != 'CrebA']))
 plot_df = plot_df[plot_df$spcg_cat != 'Prolyl hydroxylation', ]
 
 p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', fill = 'logFC')) +
@@ -62,7 +87,9 @@ p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', 
     panel.spacing = unit(x = 1, units = "lines"),
     strip.background = element_blank()
   ) + 
-  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), axis.text = element_text(size=15), text = element_text(size = 15)) +
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), 
+        axis.text = element_text(size=18), text = element_text(size = 18), 
+        legend.position = 'bottom') +
   ggtitle("Stage 10-12 Embryos")
 ggsave(filename = file.path(TARGET_dir, "stage10-12_logFC.png"), plot = p, width = 31, height = 7)
 
