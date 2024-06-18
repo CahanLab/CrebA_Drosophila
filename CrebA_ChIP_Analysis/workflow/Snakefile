@@ -88,25 +88,25 @@ rule trim_range_peaks:
         "../input/GEO_processed/GSM4213094_fkh_CrebA_peaks.narrowPeak",
         "../input/GEO_processed/GSM4213096_sage_CrebA_peaks.narrowPeak"
     output: 
-        "../output/range_peak_regions/oregon_fkh_sage_intersect_500.narrowPeak",
-        "../output/range_peak_regions/CrebA_oregon_500.narrowPeak", 
-        "../output/range_peak_regions/CrebA_fkh_500.narrowPeak",
-        "../output/range_peak_regions/CrebA_sage_500.narrowPeak"
+        "../output/range_peak_regions/oregon_fkh_sage_intersect.narrowPeak",
+        "../output/range_peak_regions/CrebA_oregon.narrowPeak", 
+        "../output/range_peak_regions/CrebA_fkh.narrowPeak",
+        "../output/range_peak_regions/CrebA_sage.narrowPeak"
     shell: 
         """
         mkdir -p ../output/range_peak_regions/
-        python trim_peaks_500.py
+        python trim_peaks_range.py
         """
 
 # get the all unique peaks between fkh and sage ChIP-seq 
 # get peaks that are more than 250 bps apart 
 rule find_fkh_sage_peaks: 
     input: 
-        "../output/500_peak_regions/CrebA_fkh_500.narrowPeak", 
-        "../output/500_peak_regions/CrebA_sage_500.narrowPeak"
+        "../output/range_peak_regions/CrebA_fkh.narrowPeak", 
+        "../output/range_peak_regions/CrebA_sage.narrowPeak"
     output: 
-        "../output/500_peak_regions/sage_contrast_fkh_500.narrowPeak",
-        "../output/500_peak_regions/fkh_sage_unique_500.narrowPeak"
+        "../output/range_peak_regions/sage_contrast_fkh.narrowPeak",
+        "../output/range_peak_regions/fkh_sage_unique.narrowPeak"
     shell: 
         """
         bedtools intersect -a {input[1]} -b {input[0]} -f 0.5 -v > {output[0]}
@@ -117,23 +117,23 @@ rule find_fkh_sage_peaks:
 # get peaks that are less than 250 bps apart 
 rule find_fkh_sage_intersect_peaks: 
     input: 
-        "../output/500_peak_regions/CrebA_fkh_500.narrowPeak", 
-        "../output/500_peak_regions/CrebA_sage_500.narrowPeak"
+        "../output/range_peak_regions/CrebA_fkh.narrowPeak", 
+        "../output/range_peak_regions/CrebA_sage.narrowPeak"
     output: 
-        "../output/500_peak_regions/fkh_sage_intersect_500.narrowPeak"
+        "../output/range_peak_regions/fkh_sage_intersect.narrowPeak"
     shell: 
         """
-        bedtools intersect -a {input[0]} -b {input[1]} -f 0.5 -wa > {output}  
+        bedtools intersect -a {input[1]} -b {input[0]} -f 0.25 -wa > {output}  
         """
 
 ##### match the peaks to a gene ######
 # match the peak to a gene 
 rule match_peak_gene: 
     input: 
-        "../output/500_peak_regions/fkh_sage_intersect_500.narrowPeak", 
-        "../output/500_peak_regions/fkh_sage_unique_500.narrowPeak"
+        "../output/range_peak_regions/fkh_sage_intersect.narrowPeak", 
+        "../output/range_peak_regions/fkh_sage_unique.narrowPeak"
     output: 
     shell: 
         """
-        python3 match_nearest_region_to_genes_250_1kb.py
+        python3 match_nearest_region_to_genes_range.py
         """

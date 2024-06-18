@@ -6,10 +6,11 @@ import os
 if os.path.isdir("../output/match_nearest_gene/") == False:
     os.makedirs('../output/match_nearest_gene/')
 
+promoter_tss = pd.read_csv("../output/tss_table/tss_table.txt")
+
 # match the peaks to genes 
-for tmp_file in ['fkh_sage_intersect_500', 'fkh_sage_unique_500']:
-    narrow_peaks = pd.read_csv(os.path.join("../output/500_peak_regions/" + tmp_file + ".narrowPeak"), sep="\t", header=None)
-    promoter_tss = pd.read_csv("../output/tss_table/tss_table.txt")
+for tmp_file in ['fkh_sage_intersect', 'fkh_sage_unique']:
+    narrow_peaks = pd.read_csv(os.path.join("../output/range_peak_regions/" + tmp_file + ".narrowPeak"), sep="\t", header=None)
     narrow_peaks['in_region_fly_id'] = None 
     narrow_peaks['in_region_gene'] = None 
     narrow_peaks[0] = narrow_peaks[0].str.removeprefix('chr')
