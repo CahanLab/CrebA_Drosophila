@@ -110,7 +110,7 @@ p <- ggplot(data = spcg_dot_df, mapping = aes_string(y = 'id', x = 'features.plo
         axis.text = element_text(size=17), text = element_text(size = 17), 
         legend.position = 'bottom') +
   ggtitle("Stage 10-12 Embryos")
-ggsave(filename = file.path(TARGET_dir, subfolder_path, "spcg_dot_scaled.png"), plot = p, width = 31, height = 10)
+ggsave(filename = file.path(TARGET_dir, subfolder_path, "spcg_dot_scaled.png"), plot = p, width = 32, height = 10)
 
 # plot out the unscaled version 
 p <- ggplot(data = spcg_dot_df, mapping = aes_string(y = 'id', x = 'features.plot')) +

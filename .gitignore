@@ -31,3 +31,7 @@ Meetings/*
 manuscript/* 
 
 analysis/.Rprofile
+
+CrebA_ChIP_Analysis/input/*
+CrebA_ChIP_Analysis/output/*
+CrebA_ChIP_Analysis/workflow/.snakemake/*
