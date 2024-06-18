@@ -42,49 +42,10 @@ def find_bound_in_region_genes(peak_path, DE_path):
 
     return output_df 
 
-###### +/- 1kb unique genes ######
-peak_path = "../output/match_nearest_gene/oregon_fkh_sage_unique_in_region_genes.csv"
-DE_path = "../input/manual_curated_DE_genes/manual_curated_DE.xlsx"
-output_df = find_bound_in_region_genes(peak_path, DE_path)
-print(output_df)
+spcg_df = pd.read_excel('../input/SPCG_files/SPCG List.xlsx')
 
-narrow_peaks = pd.read_csv(peak_path, index_col=0)
-narrow_peaks = narrow_peaks.loc[narrow_peaks['in_region_gene'].isna() == False, :]
-print(narrow_peaks.shape[0])
-
-bound_genes = list()
-for i in narrow_peaks.index: 
-    bound_genes = bound_genes + narrow_peaks.loc[i, 'in_region_fly_id'].split(",")
-bound_genes = np.unique(bound_genes)
-print(len(bound_genes))
-
-spcg_df = pd.read_excel('../../SPCG_files/SPCG List.xlsx')
-spcg_df['oregon_fkh_sage_unique_peaks_bound'] = False
-spcg_df.loc[spcg_df['Drosophila FBgn'].isin(bound_genes), 'oregon_fkh_sage_unique_peaks_bound'] = True
-np.sum(spcg_df['Drosophila FBgn'].isin(bound_genes)) / spcg_df.shape[0]
-
-###### +/- 1kb intersect genes ######
-peak_path = "../output/match_nearest_gene/oregon_fkh_sage_intersect_in_region_genes.csv"
-DE_path = "../input/manual_curated_DE_genes/manual_curated_DE.xlsx"
-output_df = find_bound_in_region_genes(peak_path, DE_path)
-print(output_df)
-
-narrow_peaks = pd.read_csv(peak_path, index_col=0)
-narrow_peaks = narrow_peaks.loc[narrow_peaks['in_region_gene'].isna() == False, :]
-print(narrow_peaks.shape[0])
-bound_genes = list()
-for i in narrow_peaks.index: 
-    bound_genes = bound_genes + narrow_peaks.loc[i, 'in_region_fly_id'].split(",")
-bound_genes = np.unique(bound_genes)
-print(len(bound_genes))
-
-spcg_df['oregon_fkh_sage_intersect_peaks_bound'] = False
-spcg_df.loc[spcg_df['Drosophila FBgn'].isin(bound_genes), 'oregon_fkh_sage_intersect_peaks_bound'] = True
-np.sum(spcg_df['Drosophila FBgn'].isin(bound_genes)) / spcg_df.shape[0]
-spcg_df.to_csv(os.path.join(output_path, 'spcg_annotation.csv'))
-
-###### +/- 1kb fkh sage genes ######
-peak_path = "../output/match_nearest_gene/fkh_sage_unique_in_region_genes.csv"
+###### +/- 1kb fkh sage intersect genes ######
+peak_path = "../output/match_nearest_gene/fkh_sage_intersect_500_genes.csv"
 DE_path = "../input/manual_curated_DE_genes/manual_curated_DE.xlsx"
 output_df = find_bound_in_region_genes(peak_path, DE_path)
 print(output_df)
@@ -101,11 +62,11 @@ print(len(bound_genes))
 spcg_df['fkh_sage_intersect_peaks_bound'] = False
 spcg_df.loc[spcg_df['Drosophila FBgn'].isin(bound_genes), 'fkh_sage_intersect_peaks_bound'] = True
 np.sum(spcg_df['Drosophila FBgn'].isin(bound_genes)) / spcg_df.shape[0]
-spcg_df.to_csv(os.path.join(output_path, 'spcg_annotation.csv'))
 
-##### look at the DE genes #####
-peak_path = "../output/match_nearest_gene/fkh_sage_unique_in_region_genes.csv"
+##### +/- 1kb fkh sage unique ##### 
+peak_path = "../output/match_nearest_gene/fkh_sage_unique_500_genes.csv"
 DE_path = "../input/manual_curated_DE_genes/manual_curated_DE.xlsx"
+output_df = find_bound_in_region_genes(peak_path, DE_path)
 print(output_df)
 
 narrow_peaks = pd.read_csv(peak_path, index_col=0)
@@ -113,16 +74,12 @@ narrow_peaks = narrow_peaks.loc[narrow_peaks['in_region_gene'].isna() == False, 
 print(narrow_peaks.shape[0])
 bound_genes = list()
 for i in narrow_peaks.index: 
-    bound_genes = bound_genes + narrow_peaks.loc[i, 'in_region_gene'].split(",")
+    bound_genes = bound_genes + narrow_peaks.loc[i, 'in_region_fly_id'].split(",")
 bound_genes = np.unique(bound_genes)
 print(len(bound_genes))
 
-DE_mut = pd.read_csv("../../../results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv")
-down_mut = DE_mut.loc[DE_mut['padj'] < 0.05, :]
-down_mut = down_mut.loc[down_mut['logFC'] < 0, :]
-np.sum(down_mut['feature'].isin(bound_genes))
+spcg_df['fkh_sage_unique_peaks_bound'] = False
+spcg_df.loc[spcg_df['Drosophila FBgn'].isin(bound_genes), 'fkh_sage_unique_peaks_bound'] = True
+np.sum(spcg_df['Drosophila FBgn'].isin(bound_genes)) / spcg_df.shape[0]
 
-up_mut = DE_mut.loc[DE_mut['padj'] < 0.05, :]
-up_mut = up_mut.loc[up_mut['logFC'] > 0, :]
-np.sum(up_mut['feature'].isin(bound_genes))
-
+spcg_df.to_csv(os.path.join(output_path, "spcg_match.csv"))
