@@ -45,7 +45,7 @@ def find_bound_in_region_genes(peak_path, DE_path):
 spcg_df = pd.read_excel('../input/SPCG_files/SPCG List.xlsx')
 
 ###### +/- 1kb fkh sage intersect genes ######
-peak_path = "../output/match_nearest_gene/fkh_sage_intersect_500_genes.csv"
+peak_path = "../output/match_nearest_gene/fkh_sage_intersect_genes.csv"
 DE_path = "../input/manual_curated_DE_genes/manual_curated_DE.xlsx"
 output_df = find_bound_in_region_genes(peak_path, DE_path)
 print(output_df)
@@ -64,7 +64,7 @@ spcg_df.loc[spcg_df['Drosophila FBgn'].isin(bound_genes), 'fkh_sage_intersect_pe
 np.sum(spcg_df['Drosophila FBgn'].isin(bound_genes)) / spcg_df.shape[0]
 
 ##### +/- 1kb fkh sage unique ##### 
-peak_path = "../output/match_nearest_gene/fkh_sage_unique_500_genes.csv"
+peak_path = "../output/match_nearest_gene/fkh_sage_unique_genes.csv"
 DE_path = "../input/manual_curated_DE_genes/manual_curated_DE.xlsx"
 output_df = find_bound_in_region_genes(peak_path, DE_path)
 print(output_df)
