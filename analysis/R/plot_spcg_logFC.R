@@ -91,7 +91,7 @@ p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', 
         axis.text = element_text(size=18), text = element_text(size = 18), 
         legend.position = 'bottom') +
   ggtitle("Stage 10-12 Embryos")
-ggsave(filename = file.path(TARGET_dir, "stage10-12_logFC.png"), plot = p, width = 31, height = 7)
+ggsave(filename = file.path(TARGET_dir, "stage10-12_logFC.png"), plot = p, width = 32, height = 7)
 
 ##### load and compile the late data #####
 plot_df = data.frame()

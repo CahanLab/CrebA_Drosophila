@@ -1,0 +1,231 @@
+
+# build the flybase dictionary 
+rule build_flybase_dict: 
+    input: 
+        "../input/reference_genome/dmel-all-r6.33.gtf"
+    output: 
+        "../input/flybase_gene_conversion/conversion_tab.csv"
+    shell: 
+        "python3 build_flybase_dictionary.py"
+    
+# buidl the meme matrix 
+rule convert_chen_to_meme: 
+    input: 
+        "../input/previous_CrebA_motifs/AllCrebAMotifs_probabilitymatricies.txt"
+    output: 
+        "../input/previous_CrebA_motifs/CrebAMotifs_meme.meme"
+    shell: 
+        "python3 chen_to_meme.py"
+
+rule curate_tss_table: 
+    input: 
+        "../input/reference_genome/dmel-all-r6.33.gtf", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output:
+        "../output/tss_table/promoter_regions.bed"
+    shell: 
+        "python3 get_promoter.py"
+
+rule get_regulatory_regions: 
+    input: 
+        "../input/reference_genome/dmel-all-r6.33.gtf", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output:
+        "../output/tss_table/regulatory_regions_table.txt", 
+        "../output/tss_table/regulatory_regions.bed"
+    shell: 
+        "python3 get_regulatory_regions.py"
+
+rule process_regulatory_regions_SPCGs:
+    input: 
+        "../output/tss_table/regulatory_regions.bed", 
+        "../../SPCG_files/SPCG List.xlsx"
+    output: 
+        "../output/SPCG_regulatory_regions/spcg_regulatory_regions_pos.bed"
+    shell: 
+        """
+        python3 process_regulatory_regions_SPCGs.py
+        """
+
+rule get_regulatory_regions_SPCGs_fasta: 
+    input: 
+        "../output/SPCG_regulatory_regions/spcg_regulatory_regions_pos.bed", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        "../output/SPCG_regulatory_regions/spcg_regulatory_regions_seq.fasta"
+    shell: 
+        """
+        bedtools getfasta -fi {input[1]} -bed {input[0]} -nameOnly > {output}
+        """
+
+rule FIMO_regulatory_regions_flyFactorSurvey_SPCGs: 
+    input: 
+        "../output/SPCG_regulatory_regions/spcg_regulatory_regions_seq.fasta"
+    output: 
+        
+    shell: 
+        """
+        bash FIMO_regulatory_regions_flyFactorSurvey_SPCGs.sh
+        """
+####################
+rule find_interm_intersecting_peaks: 
+    input: 
+        a="../input/GEO_processed/GSM4213092_oregon_CrebA_peaks.narrowPeak", 
+        b="../input/GEO_processed/GSM4213094_fkh_CrebA_peaks.narrowPeak",
+        c="../input/GEO_processed/GSM4213096_sage_CrebA_peaks.narrowPeak"
+    output: 
+        "../output/intersect_region_CrebA/interm_intersect_regions.narrowPeak"
+    shell: 
+        "mkdir -p ../output/intersect_region_CrebA/ && bedtools intersect -a {input.a} -b {input.b} > {output}"
+
+rule find_intersecting_peaks: 
+    input: 
+        a="../output/intersect_region_CrebA/interm_intersect_regions.narrowPeak",
+        b="../input/GEO_processed/GSM4213096_sage_CrebA_peaks.narrowPeak"
+    output: 
+        "../output/intersect_region_CrebA/intersect_regions.narrowPeak"
+    shell: 
+        "bedtools intersect -a {input.a} -b {input.b} > {output}"
+
+rule match_peaks_tss: 
+    input: 
+        "../output/intersect_region_CrebA/intersect_regions.narrowPeak"
+    output:
+        "../output/match_nearest_intersect_250_peaks/match_nearest_genes.csv"
+    shell: 
+        """
+        mkdir -p ../output/match_nearest_intersect_250_peaks/
+        python3 match_nearest_region_to_genes.py
+        """
+
+rule trim_250_peaks: 
+    input: 
+        "../input/GEO_processed/GSM4213092_oregon_CrebA_peaks.narrowPeak",
+        "../input/intersect_peaks/Set1.NEW_OR_fkh_sage_intersection_fromDA.bed", 
+        "../input/GEO_processed/GSM4213094_fkh_CrebA_peaks.narrowPeak",
+        "../input/GEO_processed/GSM4213096_sage_CrebA_peaks.narrowPeak"
+    output: 
+        "../output/500_peak_regions/oregon_fkh_sage_intersect_500.narrowPeak",
+        "../output/500_peak_regions/CrebA_oregon_500.narrowPeak", 
+        "../output/500_peak_regions/CrebA_fkh_500.narrowPeak",
+        "../output/500_peak_regions/CrebA_sage_500.narrowPeak"
+    shell: 
+        """
+        mkdir -p ../output/500_peak_regions/
+        python trim_peaks_250.py
+        """
+
+
+rule find_all_unique_peaks_1: 
+    input: 
+        "../output/500_peak_regions/CrebA_oregon_500.narrowPeak",
+        "../output/500_peak_regions/CrebA_fkh_500.narrowPeak"
+    output: 
+        '../output/500_peak_regions/fkh_unique_500.narrowPeak'
+    shell: 
+        """
+        bedtools intersect -a {input[1]} -b {input[0]} -f 0.5 -v > {output}
+        """
+
+rule find_all_unique_peaks_2: 
+    input: 
+        "../output/500_peak_regions/CrebA_oregon_500.narrowPeak",
+        '../output/500_peak_regions/fkh_unique_500.narrowPeak'
+    output: 
+        '../output/500_peak_regions/oregon_fkh_unique_500.narrowPeak'
+    shell: 
+        """
+        cat {input[0]} {input[1]} > {output}
+        """
+
+rule find_all_unique_peaks_3: 
+    input: 
+        "../output/500_peak_regions/oregon_fkh_unique_500.narrowPeak", 
+        "../output/500_peak_regions/CrebA_sage_500.narrowPeak"
+    output: 
+        "../output/500_peak_regions/sage_unique_500.narrowPeak"
+    shell: 
+        """
+        bedtools intersect -a {input[1]} -b {input[0]} -f 0.5 -v > {output}
+        """
+
+rule find_all_unique_peaks_4: 
+    input: 
+        "../output/500_peak_regions/oregon_fkh_unique_500.narrowPeak", 
+        "../output/500_peak_regions/sage_unique_500.narrowPeak"
+    output: 
+        "../output/500_peak_regions/oregon_fkh_sage_unique_500.narrowPeak"
+    shell: 
+        """
+        cat {input[0]} {input[1]} > {output}
+        """
+
+rule find_fkh_sage_peaks: 
+    input: 
+        "../output/500_peak_regions/CrebA_fkh_500.narrowPeak", 
+        "../output/500_peak_regions/CrebA_sage_500.narrowPeak"
+    output: 
+        "../output/500_peak_regions/sage_contrast_fkh_500.narrowPeak",
+        "../output/500_peak_regions/fkh_sage_unique_500.narrowPeak"
+    shell: 
+        """
+        bedtools intersect -a {input[1]} -b {input[0]} -f 0.5 -v > {output[0]}
+        cat {input[0]} {output[0]} > {output[1]}
+        """
+
+rule match_nearest_region_to_genes: 
+    input: 
+        "../output/tss_table/tss_table.txt",
+        "../output/500_peak_regions/oregon_fkh_sage_intersect_500.narrowPeak",
+        "../output/500_peak_regions/oregon_fkh_sage_unique_500.narrowPeak",
+        "../output/500_peak_regions/CrebA_oregon_500.narrowPeak"
+    output: 
+        "../output/match_nearest_gene/oregon_fkh_sage_intersect_nearest_genes.csv",
+        "../output/match_nearest_gene/oregon_fkh_sage_unique_nearest_genes.csv",
+        "../output/match_nearest_gene/oregon_nearest_genes.csv"
+    shell: 
+        """
+        python3 match_nearest_region_to_genes_250.py 
+        """
+
+rule get_promoter_SPCGs:
+    input: 
+        "../output/tss_table/promoter_regions.bed", 
+        "../../SPCG_files/SPCG List.xlsx"
+    output: 
+        "../output/SPCG_promoters/spcg_promoter_pos.bed"
+    shell: 
+        """
+        python3 get_promoter_SPCGs.py
+        """
+
+rule get_promoter_SPCGs_fasta: 
+    input: 
+        "../output/SPCG_promoters/spcg_promoter_pos.bed", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        "../output/SPCG_promoters/spcg_promoter_seq.fasta"
+    shell: 
+        """
+        bedtools getfasta -fi {input[1]} -bed {input[0]} -nameOnly > {output}
+        """
+
+rule FIMO_flyFactorSurvey_SPCGs: 
+    input: 
+        "../output/SPCG_promoters/spcg_promoter_seq.fasta"
+    output: 
+        
+    shell: 
+        """
+        bash FIMO_flyFactorSurvey_SPCGs.sh
+        """
+
+rule FIMO_CrebA_SPCGs: 
+    input: 
+        "../output/SPCG_promoters/spcg_promoter_seq.fasta"
+    output: 
+    shell: 
+        """
+        bash FIMO_CrebA_SPCGs.sh
+        """
+
