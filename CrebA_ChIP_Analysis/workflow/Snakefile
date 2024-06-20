@@ -44,6 +44,7 @@ rule get_regulatory_regions:
     shell: 
         "python3 get_regulatory_regions.py"
 
+###### run FIMO on 1.5kb +/- around SPCGs TSS ######
 # generate bed files for the SPCGs' regulatory regions 
 rule process_regulatory_regions_SPCGs:
     input: 
@@ -78,6 +79,17 @@ rule FIMO_regulatory_regions_flyFactorSurvey_SPCGs:
         """
         bash FIMO_regulatory_regions_flyFactorSurvey_SPCGs.sh
         """
+
+rule summarize_SPCGs_FIMO_regions_results: 
+    input: 
+        "../input/SPCG_files/SPCG List.xlsx", 
+        ""
+    output: 
+    shell: 
+        """
+        python3 analyze_FIMO_SPCGs.py
+        """
+
 
 ##### trim peak regions to be 500 +/- around the peak and get the intersecting peaks ######
 # trim the peak regions to be 500 +/- around the peak 

@@ -29,8 +29,8 @@ max_dict = get_max_length('../input/reference_genome/dmel-all-chromosome-r6.33.f
 # I think traditionally people use 1kb upstream of tss 
 # https://www.genome.gov/Multimedia/Slides/ENCODE2015-ResearchAppsUsers/23_ENCODE-Factorbook_Purcaro.pdf
 # https://academic.oup.com/nar/article/35/2/406/2400679?login=false
-w = 1000
-w_end = 1000 # this is just arbritary 
+w = 1500
+w_end = 1500 # this is just arbritary 
 tss_table = pd.DataFrame(data = None, index = gtf_table.index, columns = ['chrom', 'strand', 'promoter_start', 'promoter_end', 'tss', 'gene_id', 'gene_name', 'gene_length'])
 for tmp_index in gtf_table.index: 
     chrom = gtf_table.loc[tmp_index, :][0]
