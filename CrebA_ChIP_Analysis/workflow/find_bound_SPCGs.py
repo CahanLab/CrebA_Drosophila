@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 ###### to make the working directory ###### 
-output_path = "../output/match_manual_automated_in_region_peaks"
+output_path = "../output/find_bound_SPCGs"
 if os.path.isdir(output_path) == False: 
     os.makedirs(output_path)    
 
@@ -43,6 +43,10 @@ def find_bound_in_region_genes(peak_path, DE_path):
     return output_df 
 
 spcg_df = pd.read_excel('../input/SPCG_files/SPCG List.xlsx')
+conversion_tab = pd.read_csv("../input/flybase_gene_conversion/conversion_tab.csv")
+conversion_tab.index = conversion_tab['flybase']
+sub_conversion_tab = conversion_tab.loc[spcg_df['Drosophila FBgn'], :]
+spcg_df['new_gene_id'] = np.array(sub_conversion_tab['gene_names'])
 
 ###### +/- 1kb fkh sage intersect genes ######
 peak_path = "../output/match_nearest_gene/fkh_sage_intersect_genes.csv"
