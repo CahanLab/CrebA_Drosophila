@@ -35,20 +35,25 @@ bound_genes = np.unique(bound_genes)
 venn3([set(bound_genes), set(spcgs_genes), set(down_genes)], ('Bound Genes', 'SPCGs', 'Down Genes'))  
 plt.title("Bound Genes, SPCGs, Down Genes") 
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_down_venn.png'), dpi=300, bbox_inches='tight')
+plt.clf()
 
 venn3([set(bound_genes), set(spcgs_genes), set(sc_down_genes)], ('Bound Genes', 'SPCGs', 'SC Down Genes'))  
 plt.title("Bound Genes, SPCGs, SC Down Genes") 
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_scdown_venn.png'), dpi=300, bbox_inches='tight')
+plt.clf()
 
 venn3([set(bound_genes), set(spcgs_genes), set(up_genes)], ('Bound Genes', 'SPCGs', 'Up Genes'))  
 plt.title("Bound Genes, SPCGs, Up Genes") 
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_up_venn.png'), dpi=300, bbox_inches='tight')
+plt.clf()
 
 venn3([set(bound_genes), set(spcgs_genes), set(sc_up_genes)], ('Bound Genes', 'SPCGs', 'SC Up Genes'))  
 plt.title("Bound Genes, SPCGs, SC Up Genes") 
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_scup_venn.png'), dpi=300, bbox_inches='tight')
+plt.clf()
 
 venn3([set(bound_genes), set(down_genes), set(up_genes)], ('Bound Genes', 'Down Genes', 'Up Genes'))  
 plt.title("Bound Genes, Down Genes, Up Genes") 
 plt.savefig(os.path.join(output_path, 'bound_down_up_venn.png'), dpi=300, bbox_inches='tight')
+plt.clf()
 
