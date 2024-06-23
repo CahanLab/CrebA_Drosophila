@@ -149,3 +149,26 @@ rule match_peak_gene:
         """
         python3 match_nearest_region_to_genes_range.py
         """
+
+rule find_bound_SPCGs: 
+    input: 
+        '../input/SPCG_files/SPCG List.xlsx', 
+        "../output/match_nearest_gene/fkh_sage_intersect_genes.csv", 
+        "../output/match_nearest_gene/fkh_sage_unique_genes.csv"
+    output: 
+        "../output/find_bound_SPCGs/spcg_match.csv"
+    shell: 
+        """
+        python3 find_bound_SPCGs.py
+        """
+
+rule find_bound_DE_genes: 
+    input: 
+        "../output/match_nearest_gene/fkh_sage_unique_genes.csv",
+        "../output/match_nearest_gene/fkh_sage_intersect_genes.csv"
+    output: 
+        "../output/find_bound_SPCGs/spcg_match.csv"
+    shell: 
+        """
+        python3 find_bound_DE_genes.py
+        """

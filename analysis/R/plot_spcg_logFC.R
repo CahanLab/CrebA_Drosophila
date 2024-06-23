@@ -70,7 +70,7 @@ plot_df = plot_df[plot_df$spcg_cat != 'Prolyl hydroxylation', ]
 
 p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', fill = 'logFC')) +
   geom_tile() +
-  guides(fill = guide_colorbar(title = 'logFC')) +
+  guides(fill = guide_colorbar(title = 'logFC', barwidth=30)) +
   scale_fill_gradient2(low = scales::muted("red"), mid = "white", high = scales::muted("blue"), 
                         midpoint = 0, limits = c(-1.6, 0.5)) +
   labs(
