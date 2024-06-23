@@ -172,3 +172,20 @@ rule find_bound_DE_genes:
         """
         python3 find_bound_DE_genes.py
         """
+
+rule plot_intersect_bound_genes: 
+    input: 
+        "../output/find_bound_DE_genes/down_DE.csv",
+        "../output/find_bound_DE_genes/up_DE.csv",
+        "../output/find_bound_SPCGs/spcg_match.csv",
+        "../output/match_nearest_gene/fkh_sage_intersect_genes.csv"
+    output: 
+        "../output/bound_spcg_DE_venn/bound_SPCGs_down_venn.png", 
+        "../output/bound_spcg_DE_venn/bound_SPCGs_scdown_venn.png", 
+        "../output/bound_spcg_DE_venn/bound_SPCGs_up_venn.png", 
+        "../output/bound_spcg_DE_venn/bound_SPCGs_scup_venn.png", 
+        "../output/bound_spcg_DE_venn/bound_down_up_venn.png",
+    shell: 
+        """
+        python3 plot_intersect_Bound_genes.py
+        """
