@@ -135,7 +135,7 @@ rule find_fkh_sage_intersect_peaks:
         "../output/range_peak_regions/fkh_sage_intersect.narrowPeak"
     shell: 
         """
-        bedtools intersect -a {input[1]} -b {input[0]} -f 0.25 -wa > {output}  
+        bedtools intersect -a {input[1]} -b {input[0]} -f 0.25 -u -wa > {output}  
         """
 
 ##### match the peaks to a gene ######
@@ -167,7 +167,6 @@ rule find_bound_DE_genes:
         "../output/match_nearest_gene/fkh_sage_unique_genes.csv",
         "../output/match_nearest_gene/fkh_sage_intersect_genes.csv"
     output: 
-        "../output/find_bound_SPCGs/spcg_match.csv"
     shell: 
         """
         python3 find_bound_DE_genes.py
