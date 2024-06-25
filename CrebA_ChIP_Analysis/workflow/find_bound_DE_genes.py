@@ -24,6 +24,10 @@ for tmp_type in ['up', 'down']:
         sub_sc_DE = sc_DE.loc[np.logical_and(sc_DE['logFC'] < -0.15, sc_DE['pval'] < 0.05), :]      
     sc_genes = np.array(sub_sc_DE['feature'])
     ma_genes = []
+
+    # check if MA DE genes is in the transcriptome or not 
+    sub_ma_DE['in_new_transcriptome'] = np.array(sub_ma_DE['Gene Symbol'].isin(np.array(promoter_tab[6])))
+    sub_ma_DE.to_csv(os.path.join(output_path, tmp_type + '_ma_DE.csv'))
     for tmp_gene in list(sub_ma_DE['Gene Symbol']):
         if tmp_gene == datetime.datetime(2009, 9, 5, 0, 0): 
             ma_genes = ma_genes + ['Sep5']
@@ -42,6 +46,7 @@ for tmp_type in ['up', 'down']:
     my_df['MA_DE'] = my_df['genes'].isin(ma_genes)
     my_df['SC_DE'] = my_df['genes'].isin(sc_genes)
     my_df['both_DE'] = np.logical_and(my_df['MA_DE'], my_df['SC_DE'])
+    my_df['in_transcriptome'] = np.array(my_df['genes'].isin(np.array(promoter_tab[6])))
     reg_genes[tmp_type] = my_df
 
 # see if these genes are bound or not 
