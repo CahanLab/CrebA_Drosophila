@@ -84,19 +84,6 @@ source("R/plot_crebA_wt_early_late.R")
 # look at the spcg in the wild type data 
 source("R/plot_spcg_wt.R")
 
-# look at the spcgs and their binding motif 
-source("R/plot_spcg_motif.R")
-
 # plot out the logFC of SPCGs among cell types 
 source("R/plot_spcg_logFC.R")
-
-# test for co-binding motifs 
-source("R/cobinding_motifs_analysis.R")
-
-# look at the DE genes across tissues in scRNA-seq and compare with microarray 
-# categorize the genes as down, up or statisc 
-source("R/categorize_genes.R")
-
-# run enrichment analysis of the different genes 
-source('R/enrichment_categorized_DE_genes.R')
 
