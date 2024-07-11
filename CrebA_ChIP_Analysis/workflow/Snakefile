@@ -33,7 +33,7 @@ rule get_promoter_regions:
     shell: 
         "python3 get_promoter.py"
 
-# get 1kb +/- surrounding TSS of the genes 
+# get 1.5kb +/- surrounding TSS of the genes 
 rule get_regulatory_regions: 
     input: 
         "../input/reference_genome/dmel-all-r6.33.gtf", 
@@ -187,4 +187,12 @@ rule plot_intersect_bound_genes:
     shell: 
         """
         python3 plot_intersect_Bound_genes.py
+        """
+
+rule get_bound_genes_fasta: 
+    input: 
+    output: 
+    shell: 
+        """
+        python3 get_bound_genes_coordinate.py
         """
