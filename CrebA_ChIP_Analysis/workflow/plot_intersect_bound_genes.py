@@ -31,25 +31,41 @@ for i in crebA_bound_df.index:
     bound_genes = bound_genes + crebA_bound_df.loc[i, 'in_region_gene'].split(",")
 bound_genes = np.unique(bound_genes)
 
+# see how many of the genes are uniquely bounded 
+unique_bound_genes = list()
+for my_index in crebA_bound_df.index: 
+    in_region_genes = crebA_bound_df.loc[my_index, 'in_region_gene']
+    if "," not in in_region_genes: 
+        unique_bound_genes.append(in_region_genes)
+multi_bound_genes = np.setdiff1d(bound_genes, unique_bound_genes)
+
 ###### there are to make plots #######
-venn3([set(bound_genes), set(spcgs_genes), set(down_genes)], ('Bound Genes', 'SPCGs', 'Down Genes'))  
-plt.title("Bound Genes, SPCGs, Down Genes") 
+venn3([set(bound_genes), set(spcgs_genes), set(down_genes)], 
+      ('Bound genes', 'SPCGs', 'Activated genes'), 
+      set_colors = ['#e78ac3', '#ffd92f', '#66c2a5'], alpha = 0.8)  
+plt.title("CrebA bound and activated genes") 
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_down_venn.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
-venn3([set(bound_genes), set(spcgs_genes), set(sc_down_genes)], ('Bound Genes', 'SPCGs', 'SC Down Genes'))  
-plt.title("Bound Genes, SPCGs, SC Down Genes") 
-plt.savefig(os.path.join(output_path, 'bound_SPCGs_scdown_venn.png'), dpi=300, bbox_inches='tight')
+venn3([set(bound_genes), set(spcgs_genes), set(sc_down_genes)], 
+      ('Bound genes', 'SPCGs', 'Activated genes'), 
+      set_colors = ['#e78ac3', '#ffd92f', '#66c2a5'], alpha = 0.8)  
+plt.title("CrebA bound and activated genes in salivary gland") 
+plt.savefig(os.path.join(output_path, 'bound_SPCGs_down_venn_sg.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
-venn3([set(bound_genes), set(spcgs_genes), set(up_genes)], ('Bound Genes', 'SPCGs', 'Up Genes'))  
-plt.title("Bound Genes, SPCGs, Up Genes") 
+venn3([set(bound_genes), set(spcgs_genes), set(up_genes)], 
+      ('Bound genes', 'SPCGs', 'Repressed Genes'), 
+      set_colors = ['#e78ac3', '#ffd92f', '#fc8d62'], alpha = 0.8)  
+plt.title("CrebA bound and repressed genes") 
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_up_venn.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
-venn3([set(bound_genes), set(spcgs_genes), set(sc_up_genes)], ('Bound Genes', 'SPCGs', 'SC Up Genes'))  
-plt.title("Bound Genes, SPCGs, SC Up Genes") 
-plt.savefig(os.path.join(output_path, 'bound_SPCGs_scup_venn.png'), dpi=300, bbox_inches='tight')
+venn3([set(bound_genes), set(spcgs_genes), set(sc_up_genes)], 
+      ('Bound genes', 'SPCGs', 'Repressed Genes'), 
+      set_colors = ['#e78ac3', '#ffd92f', '#fc8d62'], alpha = 0.8)  
+plt.title("CrebA bound and repressed genes in salivary gland") 
+plt.savefig(os.path.join(output_path, 'bound_SPCGs_up_venn_sg.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
 venn3([set(bound_genes), set(down_genes), set(up_genes)], ('Bound Genes', 'Down Genes', 'Up Genes'))  
@@ -57,3 +73,29 @@ plt.title("Bound Genes, Down Genes, Up Genes")
 plt.savefig(os.path.join(output_path, 'bound_down_up_venn.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
+# multi single activate genes in sg 
+fig, ax = plt.subplots(figsize=(10, 10))  # width and height in inches
+ax = venn3([set(multi_bound_genes), set(unique_bound_genes), set(sc_down_genes)], 
+      ('Multi-bound genes', 'Single-bound genes', 'Activated genes'), 
+      set_colors = ['#FF99CC', '#C060A6', '#66c2a5'], alpha = 0.8)  
+plt.title("mutli, single activated genes in SG") 
+plt.savefig(os.path.join(output_path, 'multi-single-activate-sg.png'), dpi=300, bbox_inches='tight')
+plt.clf()
+
+# multi single repressed genes in sg 
+fig, ax = plt.subplots(figsize=(10, 10))  # width and height in inches
+ax = venn3([set(multi_bound_genes), set(unique_bound_genes), set(sc_up_genes)], 
+      ('Multi-bound genes', 'Single-bound genes', 'Repressed genes'), 
+      set_colors = ['#FF99CC', '#C060A6', '#fc8d62'], alpha = 0.8)  
+plt.title("mutli, single repressed genes in SG") 
+plt.savefig(os.path.join(output_path, 'multi-single-repressed-sg.png'), dpi=300, bbox_inches='tight')
+plt.clf()
+
+# multi single in SPCGs
+fig, ax = plt.subplots(figsize=(10, 10))  # width and height in inches
+ax = venn3([set(multi_bound_genes), set(unique_bound_genes), set(spcgs_genes)], 
+      ('Multi-bound genes', 'Single-bound genes', 'SPCGs'), 
+      set_colors = ['#FF99CC', '#C060A6', '#ffd92f'], alpha = 0.8)  
+plt.title("mutli, single bound in SPCGs") 
+plt.savefig(os.path.join(output_path, 'multi-single-SPCGs.png'), dpi=300, bbox_inches='tight')
+plt.clf()

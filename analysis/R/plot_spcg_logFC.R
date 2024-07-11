@@ -68,6 +68,8 @@ plot_df$celltype = factor(plot_df$celltype, levels = sub_exp_order$celltype)
 plot_df$spcg_cat = factor(plot_df$spcg_cat, levels = c("CrebA", unique(spcg_tab$`SPCG General Functional Categories`)[unique(spcg_tab$`SPCG General Functional Categories`) != 'CrebA']))
 plot_df = plot_df[plot_df$spcg_cat != 'Prolyl hydroxylation', ]
 
+write.csv(plot_df, file = file.path(TARGET_dir, 'stage10-12_logFC.csv'))
+
 p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', fill = 'logFC')) +
   geom_tile() +
   guides(fill = guide_colorbar(title = 'logFC', barwidth=30)) +
@@ -115,6 +117,7 @@ plot_df$celltype = factor(plot_df$celltype, levels = sub_exp_order$celltype)
 plot_df$spcg_cat = factor(plot_df$spcg_cat, levels = unique(spcg_tab$`SPCG General Functional Categories`))
 plot_df = plot_df[plot_df$spcg_cat != 'Prolyl hydroxylation', ]
 
+write.csv(plot_df, file = file.path(TARGET_dir, 'stage13-16_logFC.csv'))
 p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', fill = 'logFC')) +
   geom_tile() +
   guides(fill = guide_colorbar(title = 'logFC')) +

@@ -78,6 +78,9 @@ source("R/create_color_palette.R")
 # make the plot for the cell types annotations in both CrebA and wildtype 
 source("R/plot_celltypes.R")
 
+# make the plots for the statics of CrebA dataset 
+source("R/plot_crebA_stats.R")
+
 # make the plots of the common cell types 
 source("R/plot_crebA_wt_early_late.R")
 
@@ -87,3 +90,5 @@ source("R/plot_spcg_wt.R")
 # plot out the logFC of SPCGs among cell types 
 source("R/plot_spcg_logFC.R")
 
+# plot out the correlation between logFC and normalized expression of CrebA 
+source("R/plot_logFC_norm_Exp_crebA.R")
