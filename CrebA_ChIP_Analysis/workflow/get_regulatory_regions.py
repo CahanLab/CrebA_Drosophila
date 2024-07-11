@@ -36,13 +36,14 @@ for tmp_index in gtf_table.index:
     chrom = gtf_table.loc[tmp_index, :][0]
     strand = gtf_table.loc[tmp_index, :][6]
     if strand == "+":
-        promoter_start = np.max([gtf_table.loc[tmp_index, :][3] - w, 0])
-        promoter_end = np.min([gtf_table.loc[tmp_index, :][3] + w_end, int(max_dict[chrom])])
-        tss = gtf_table.loc[tmp_index, :][3]
+        tss = gtf_table.loc[tmp_index, :][3] - 1
+        promoter_start = np.max([tss - w, 0])
+        promoter_end = np.min([tss + w_end, int(max_dict[chrom])])
     else:
-        promoter_start = np.min([gtf_table.loc[tmp_index, :][4] + w, int(max_dict[chrom])])
-        promoter_end = np.max([gtf_table.loc[tmp_index, :][4] - w_end, 0])
-        tss = gtf_table.loc[tmp_index, :][4]
+        tss = gtf_table.loc[tmp_index, :][4] - 1
+        promoter_start = np.min([tss + w, int(max_dict[chrom])])
+        promoter_end = np.max([tss - w_end, 0])
+        
     gene_strings = gtf_table.loc[tmp_index, :][8]
     gene_strings = gene_strings.split('"')
     gene_id = gene_strings[1]
