@@ -44,6 +44,19 @@ rule get_regulatory_regions:
     shell: 
         "python3 get_regulatory_regions.py"
 
+# get 400bp +/- surrounding TSS of the gene 
+rule get_regulatory_regions_400bp: 
+    input: 
+        "../input/reference_genome/dmel-all-r6.33.gtf", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output:
+        "../output/tss_table/regulatory_regions_table_400bp.txt", 
+        "../output/tss_table/regulatory_regions_400bp.bed"
+    shell: 
+        """
+        python3 get_regulatory_regions_400bp.py
+        """
+
 ###### run FIMO on 1.5kb +/- around SPCGs TSS ######
 # generate bed files for the SPCGs' regulatory regions 
 rule process_regulatory_regions_SPCGs:
@@ -82,8 +95,7 @@ rule FIMO_regulatory_regions_flyFactorSurvey_SPCGs:
 
 rule summarize_SPCGs_FIMO_regions_results: 
     input: 
-        "../input/SPCG_files/SPCG List.xlsx", 
-        ""
+        "../input/SPCG_files/SPCG List.xlsx"
     output: 
     shell: 
         """
@@ -125,8 +137,6 @@ rule find_fkh_sage_peaks:
         cat {input[0]} {output[0]} > {output[1]}
         """
 
-# get the intersecting peaks between fkh and sage ChIP-seq data 
-# get peaks that are less than 250 bps apart 
 rule find_fkh_sage_intersect_peaks: 
     input: 
         "../output/range_peak_regions/CrebA_fkh.narrowPeak", 
@@ -170,6 +180,7 @@ rule find_bound_DE_genes:
     shell: 
         """
         python3 find_bound_DE_genes.py
+        Rscript enrichment_categorized_DE_genes.R
         """
 
 rule plot_intersect_bound_genes: 
@@ -189,10 +200,182 @@ rule plot_intersect_bound_genes:
         python3 plot_intersect_Bound_genes.py
         """
 
-rule get_bound_genes_fasta: 
+rule process_regulatory_regions_bound_genes: 
     input: 
+        "../output/tss_table/regulatory_regions.bed", 
+        "../output/find_bound_DE_genes/down_DE.csv", 
+        "../output/find_bound_DE_genes/up_DE.csv"
     output: 
+        "../output/bound_genes_regulatory_regions/down_genes_reg_regions.bed",
+        "../output/bound_genes_regulatory_regions/up_genes_reg_regions.bed"
     shell: 
         """
-        python3 get_bound_genes_coordinate.py
+        python3 process_regulatory_regions_bound_genes.py
+        """
+
+rule fimo_activated_bound_genes: 
+    input:
+        "../input/motif_databases.12.23/FLY/fly_factor_survey.meme", 
+        "../output/bound_genes_regulatory_regions/down_genes_reg_regions.bed", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        "../output/bound_genes_regulatory_regions/down_genes/bound_regulatory_regions_seq.fasta",
+        directory("../output/bound_genes_regulatory_regions/down_genes/fly_factor_survey/")
+    shell: 
+        """
+        bedtools getfasta -fi {input[2]} -bed {input[1]} -nameOnly > {output[0]}
+        bash FIMO_regulatory_regions_flyFactorSurvey_bound_genes_down.sh
+        """
+
+rule fimo_repressed_bound_genes: 
+    input: 
+        "../input/motif_databases.12.23/FLY/fly_factor_survey.meme", 
+        "../output/bound_genes_regulatory_regions/up_genes_reg_regions.bed", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        "../output/bound_genes_regulatory_regions/up_genes/bound_regulatory_regions_seq.fasta",
+        directory("../output/bound_genes_regulatory_regions/up_genes/fly_factor_survey/")
+    shell: 
+        """
+        bedtools getfasta -fi {input[2]} -bed {input[1]} -nameOnly > {output[0]}
+        bash FIMO_regulatory_regions_flyFactorSurvey_bound_genes_up.sh
+        """
+
+rule fimo_static_bound_genes: 
+    input: 
+        "../input/motif_databases.12.23/FLY/fly_factor_survey.meme", 
+        "../output/bound_genes_regulatory_regions/static_genes_reg_regions.bed", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        "../output/bound_genes_regulatory_regions/static_genes/bound_regulatory_regions_seq.fasta",
+        directory("../output/bound_genes_regulatory_regions/static_genes/fly_factor_survey/")
+    shell: 
+        """
+        bedtools getfasta -fi {input[2]} -bed {input[1]} -nameOnly > {output[0]}
+        bash FIMO_regulatory_regions_flyFactorSurvey_bound_genes_static.sh
+        """
+
+rule analyze_bound_genes_FIMO: 
+    input: 
+        "../output/find_bound_DE_genes/down_DE.csv",
+        "../output/find_bound_DE_genes/up_DE.csv", 
+        "../output/bound_genes_regulatory_regions/static_DE.csv"
+    output: 
+        '../output/bound_genes_regulatory_regions/down_flyfactorsurvey_hits.csv',
+        '../output/bound_genes_regulatory_regions/down_flyfactorsurvey_hits_prop.csv',
+        '../output/bound_genes_regulatory_regions/up_flyfactorsurvey_hits.csv',
+        '../output/bound_genes_regulatory_regions/up_flyfactorsurvey_hits_prop.csv',
+        '../output/bound_genes_regulatory_regions/static_flyfactorsurvey_hits.csv',
+        '../output/bound_genes_regulatory_regions/static_flyfactorsurvey_hits_prop.csv'
+    shell: 
+        """
+        python analyze_FIMO_down_genes.py 
+        python analyze_FIMO_up_genes.py 
+        python analyze_FIMO_static_genes.py 
+        """
+
+rule plot_distance_from_tss: 
+    input: 
+        '../output/match_nearest_gene/fkh_sage_intersect_genes.csv',
+        "../output/tss_table/regulatory_regions_table.txt",
+        "../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv",
+        "../output/find_bound_DE_genes/down_DE.csv",
+        "../output/find_bound_DE_genes/up_DE.csv"
+    output: 
+        directory('../output/plot_location_crebA_binding')
+    shell: 
+        """
+        Rscript plot_distance_crebA.R
+        """
+
+
+rule fimo_activated_bound_genes_400: 
+    input:
+        "../input/motif_databases.12.23/FLY/fly_factor_survey.meme", 
+        "../output/bound_genes_regulatory_regions_400bp/down_genes_reg_regions.bed", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        "../output/bound_genes_regulatory_regions_400bp/down_genes/bound_regulatory_regions_seq.fasta",
+        directory("../output/bound_genes_regulatory_regions_400bp/down_genes/fly_factor_survey/")
+    shell: 
+        """
+        bedtools getfasta -fi {input[2]} -bed {input[1]} -nameOnly > {output[0]}
+        bash FIMO_regulatory_regions_flyFactorSurvey_bound_genes_down_400bp.sh
+        """
+
+rule fimo_repressed_bound_genes_400: 
+    input: 
+        "../input/motif_databases.12.23/FLY/fly_factor_survey.meme", 
+        "../output/bound_genes_regulatory_regions_400bp/up_genes_reg_regions.bed", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        "../output/bound_genes_regulatory_regions_400bp/up_genes/bound_regulatory_regions_seq.fasta",
+        directory("../output/bound_genes_regulatory_regions_400bp/up_genes/fly_factor_survey/")
+    shell: 
+        """
+        bedtools getfasta -fi {input[2]} -bed {input[1]} -nameOnly > {output[0]}
+        bash FIMO_regulatory_regions_flyFactorSurvey_bound_genes_up_400bp.sh
+        """
+
+rule fimo_static_bound_genes_400: 
+    input: 
+        "../input/motif_databases.12.23/FLY/fly_factor_survey.meme", 
+        "../output/bound_genes_regulatory_regions_400bp/static_genes_reg_regions.bed", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        "../output/bound_genes_regulatory_regions_400bp/static_genes/bound_regulatory_regions_seq.fasta",
+        directory("../output/bound_genes_regulatory_regions_400bp/static_genes/fly_factor_survey/")
+    shell: 
+        """
+        bedtools getfasta -fi {input[2]} -bed {input[1]} -nameOnly > {output[0]}
+        bash FIMO_regulatory_regions_flyFactorSurvey_bound_genes_static_400bp.sh
+        """
+
+rule analyze_bound_genes_FIMO_400bp: 
+    input: 
+        "../output/find_bound_DE_genes/down_DE.csv",
+        "../output/find_bound_DE_genes/up_DE.csv", 
+        "../output/bound_genes_regulatory_regions/static_DE.csv"
+    output: 
+        '../output/bound_genes_regulatory_regions_400bp/down_flyfactorsurvey_hits.csv',
+        '../output/bound_genes_regulatory_regions_400bp/down_flyfactorsurvey_hits_prop.csv',
+        '../output/bound_genes_regulatory_regions_400bp/up_flyfactorsurvey_hits.csv',
+        '../output/bound_genes_regulatory_regions_400bp/up_flyfactorsurvey_hits_prop.csv',
+        '../output/bound_genes_regulatory_regions_400bp/static_flyfactorsurvey_hits.csv',
+        '../output/bound_genes_regulatory_regions_400bp/static_flyfactorsurvey_hits_prop.csv'
+    shell: 
+        """
+        python analyze_FIMO_down_genes_400bp.py 
+        python analyze_FIMO_up_genes_400bp.py 
+        python analyze_FIMO_static_genes_400bp.py 
+        """
+
+# fimo the unbound genes 
+rule fimo_unbound_genes_400: 
+    input: 
+        "../input/motif_databases.12.23/FLY/fly_factor_survey.meme", 
+        "../output/bound_genes_regulatory_regions_400bp_null/no_bound_genes_reg_regions.bed", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        "../output/bound_genes_regulatory_regions_400bp_null/no_bound_genes/bound_regulatory_regions_seq.fasta",
+        directory("../output/bound_genes_regulatory_regions_400bp_null/no_bound_genes/fly_factor_survey/")
+    shell: 
+        """
+        bedtools getfasta -fi {input[2]} -bed {input[1]} -nameOnly > {output[0]}
+        bash FIMO_regulatory_regions_flyFactorSurvey_no_bound_genes_400bp.sh
+        """
+
+# run fimo on random sequences 
+rule fimo_random_genes_400: 
+    input: 
+        "../input/motif_databases.12.23/FLY/fly_factor_survey.meme", 
+        "../output/bound_genes_regulatory_regions_400bp_null/random_reg_regions.bed", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        "../output/bound_genes_regulatory_regions_400bp_null/random_genes/bound_regulatory_regions_seq.fasta",
+        directory("../output/bound_genes_regulatory_regions_400bp_null/random_genes/fly_factor_survey/")
+    shell: 
+        """
+        bedtools getfasta -fi {input[2]} -bed {input[1]} -nameOnly > {output[0]}
+        bash FIMO_regulatory_regions_flyFactorSurvey_random_genes_400bp.sh
         """

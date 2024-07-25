@@ -62,36 +62,3 @@ p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = t
 
 ggsave(filename = file.path(TARGET_dir, 'enrichment_analysis.png'), plot = p, height = 10, width = 18)
 
-###### plot out the network for downstream genes of CrebA ######
-library(igraph)
-links = data.frame(
-  'source' = rep(x = 'CrebA', length(c(down_genes, up_genes))), 
-  'target' = c(down_genes, up_genes)
-)
-nodes = data.frame(
-  names = c(down_genes[down_genes != 'CrebA'], up_genes, 'CrebA'), 
-  type = c(rep('Activation', length(down_genes[down_genes != 'CrebA'])), rep('Repression', length(up_genes)), 'CrebA')
-)
-
-# Turn it into igraph object
-network <- graph_from_data_frame(d=links, vertices=nodes, directed=F) 
-
-# Make a palette of 3 colors
-library(RColorBrewer)
-coul  <- brewer.pal(3, "Set2") 
-
-# Create a vector of color
-V(network)$type = factor(V(network)$type, levels = c('Activation', 'Repression', 'CrebA'))
-my_color <- coul[as.numeric(as.factor(V(network)$type))]
-E(network)$width = 0.1
-
-# Make the plot
-png(filename = file.path(TARGET_dir, 'creba_grn.png'), width = 5, height = 5)
-plot(network, vertex.color=my_color, vertex.size=3, 
-     vertex.label.dist=-0.7, vertex.label.cex=0.8, 
-     vertex.label.degree=-pi/2, 
-     asp=0)
-dev.off()
-
-# Add a legend
-legend("bottomleft", legend=levels(as.factor(V(network)$type))  , col = coul , bty = "n", pch=20 , pt.cex = 3, cex = 1.5, text.col=coul , horiz = FALSE, inset = c(0.1, 0.1))

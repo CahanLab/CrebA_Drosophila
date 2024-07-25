@@ -2,18 +2,25 @@ import pandas as pd
 import numpy as np 
 import os 
 
-output_path = '../output/bound_genes_regulatory_regions'
+output_path = '../output/bound_genes_regulatory_regions_400bp'
 os.makedirs(output_path, exist_ok=True)
 
 # load in the data 
-reg_region_tab = pd.read_csv("../output/tss_table/regulatory_regions.bed", sep = '\t', header = None)
+reg_region_tab = pd.read_csv("../output/tss_table/regulatory_regions_400bp.bed", sep = '\t', header=None)
+all_bound_genes = pd.read_csv("../output/plot_location_crebA_binding/all_bound_genes_dist.csv", index_col=0)
+target_bound_genes = all_bound_genes.loc[np.abs(all_bound_genes['dist_tss']) < 200, :].copy()
 
 # load in the genes that are bound genes 
 down_bound_genes_df = pd.read_csv("../output/find_bound_DE_genes/down_DE.csv", index_col = 0)
 up_bound_genes_df = pd.read_csv("../output/find_bound_DE_genes/up_DE.csv", index_col = 0)
 
 down_bound_genes_df = down_bound_genes_df.loc[down_bound_genes_df['SC_DE'] == True, :].copy()
+down_bound_genes_df = down_bound_genes_df.loc[down_bound_genes_df['bound'] == True, :].copy()
 up_bound_genes_df = up_bound_genes_df.loc[up_bound_genes_df['SC_DE'] == True, :].copy()
+up_bound_genes_df = up_bound_genes_df.loc[up_bound_genes_df['bound'] == True, :].copy()
+
+down_bound_genes_df = down_bound_genes_df.loc[down_bound_genes_df['genes'].isin(target_bound_genes['bound_gene']), :].copy()
+up_bound_genes_df = up_bound_genes_df.loc[up_bound_genes_df['genes'].isin(target_bound_genes['bound_gene']), :].copy()
 
 # make the down bed files 
 sub_reg_tab = reg_region_tab.loc[reg_region_tab[6].isin(down_bound_genes_df['genes']), :]
