@@ -9,6 +9,9 @@ output_path = "../output/bound_spcg_DE_venn"
 if os.path.isdir(output_path) == False:
     os.makedirs(output_path)
 
+flybase_df = pd.read_csv("../input/flybase_gene_conversion/conversion_tab.csv")
+flybase_df.index = flybase_df['flybase']
+
 down_DE_genes_df = pd.read_csv("../output/find_bound_DE_genes/down_DE.csv", index_col=0)
 down_genes = np.unique(down_DE_genes_df['genes'])
 down_DE_genes_df = down_DE_genes_df.loc[down_DE_genes_df['SC_DE'] == True, :]
@@ -18,6 +21,12 @@ up_DE_genes_df = pd.read_csv("../output/find_bound_DE_genes/up_DE.csv", index_co
 up_genes = np.unique(up_DE_genes_df['genes'])
 up_DE_genes_df = up_DE_genes_df.loc[up_DE_genes_df['SC_DE'] == True, :]
 sc_up_genes = np.unique(up_DE_genes_df['genes'])
+
+MA_down_genes_df = pd.read_csv("../input/nate_ma_DE/down_ma_DE_NateTranslated.csv")
+MA_down_genes = MA_down_genes_df['Converted Gene Name']
+
+MA_up_genes_df = pd.read_csv("../input/nate_ma_DE/up_ma_DE_TranslatedNate.csv")
+MA_up_genes = MA_up_genes_df['Translated Gene Names']
 
 # get the spcgs 
 spcgs_df = pd.read_csv("../output/find_bound_SPCGs/spcg_match.csv", index_col=0)
@@ -98,4 +107,22 @@ ax = venn3([set(multi_bound_genes), set(unique_bound_genes), set(spcgs_genes)],
       set_colors = ['#FF99CC', '#C060A6', '#ffd92f'], alpha = 0.8)  
 plt.title("mutli, single bound in SPCGs") 
 plt.savefig(os.path.join(output_path, 'multi-single-SPCGs.png'), dpi=300, bbox_inches='tight')
+plt.clf()
+
+# ma, sc, spcg
+fig, ax = plt.subplots(figsize=(8, 8))  # width and height in inches
+ax = venn3([set(MA_down_genes), set(sc_down_genes), set(spcgs_genes)], 
+      ('MA down genes', 'SC down genes', 'SPCGs'), 
+      set_colors = ['#6B717E', '#66c2a5', '#ffd92f'], alpha = 0.8)  
+plt.title("MA down, SC down, SPCG") 
+plt.savefig(os.path.join(output_path, 'ma_down-sc_down-SPCGs.png'), dpi=300, bbox_inches='tight')
+plt.clf()
+
+# ma up, sc up spcg
+fig, ax = plt.subplots(figsize=(8, 8))  # width and height in inches
+ax = venn3([set(MA_up_genes), set(sc_up_genes), set(spcgs_genes)], 
+      ('MA up genes', 'SC up genes', 'SPCGs'), 
+      set_colors = ['#B8D1A2', '#fc8d62', '#ffd92f'], alpha = 0.8)  
+plt.title("MA up, SC up, SPCG") 
+plt.savefig(os.path.join(output_path, 'ma_up-sc_up-SPCGs.png'), dpi=300, bbox_inches='tight')
 plt.clf()
