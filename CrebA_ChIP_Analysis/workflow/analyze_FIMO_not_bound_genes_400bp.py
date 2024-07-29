@@ -4,13 +4,13 @@ import os
 import plotnine
 import matplotlib.pyplot as plt
 
-down_bound_genes_df = pd.read_csv("../output/bound_genes_regulatory_regions_400bp/down_genes_reg_regions.bed", sep = '\t', header=None)
-down_bound_genes_df.columns = ['chrom', 'start', 'end', 'genes']
+no_bound_genes_df = pd.read_csv("../output/bound_genes_regulatory_regions_400bp_null/no_bound_genes_reg_regions.bed", sep = '\t', header=None)
+no_bound_genes_df.columns = ['chrom', 'start', 'end', 'genes']
 convert_df = pd.read_csv("../input/flybase_gene_conversion/conversion_tab.csv")
-out_path = '../output/bound_genes_regulatory_regions_400bp'
+out_path = '../output/bound_genes_regulatory_regions_400bp_null'
 
 p_thresh = 0.0001
-fimo_directory = "../output/bound_genes_regulatory_regions_400bp/down_genes/fly_factor_survey"
+fimo_directory = "../output/bound_genes_regulatory_regions_400bp_null/no_bound_genes/fly_factor_survey"
 
 ##### look at all the other TF motifs ######
 folder_list = os.listdir(fimo_directory)
@@ -20,7 +20,7 @@ folder_list = [x for x in folder_list if x != '.snakemake_timestamp']
 folder_list = [x for x in folder_list if 'untrimmed' not in x]
 TF_list = [x.split("---")[0] for x in folder_list]
 
-TF_df = pd.DataFrame(index = np.unique(TF_list), columns = down_bound_genes_df['genes'], data = 0)
+TF_df = pd.DataFrame(index = np.unique(TF_list), columns = no_bound_genes_df['genes'], data = 0)
 
 fly_id_list = []
 gene_id_list = []
@@ -33,7 +33,7 @@ for tmp_folder in folder_list:
     fimo_results = fimo_results.loc[fimo_results[7] < p_thresh, :]
     fimo_genes = fimo_results[0]
     fimo_genes = [x.split("_")[0] for x in fimo_genes]
-    fimo_genes = np.intersect1d(fimo_genes, down_bound_genes_df['genes'])
+    fimo_genes = np.intersect1d(fimo_genes, no_bound_genes_df['genes'])
     tmp_gene = tmp_folder.split("---")[0]
     fly_id_list.append(tmp_gene)
     gene_id_list.append(tmp_folder.split("---")[1].split("_")[0])
@@ -44,13 +44,13 @@ conversion_df = pd.DataFrame(np.array([fly_id_list, gene_id_list]).T, index = fl
 
 TF_df.index = conversion_df.loc[TF_df.index, 0] + " (" + conversion_df.loc[TF_df.index, 1] + ")"
 TF_df[TF_df > 1] = 1
-TF_df.to_csv(os.path.join(out_path, 'down_flyfactorsurvey_hits.csv'))
+TF_df.to_csv(os.path.join(out_path, 'no_bound_flyfactorsurvey_hits.csv'))
 
 # summarize the results 
 TF_df.sum(axis = 1).sort_values()
 prop_df = pd.DataFrame(data = np.array([TF_df.index, TF_df.sum(axis = 1)]).T, columns = ['TF_motifs', 'num_SPCGs'])
 prop_df = prop_df.sort_values('num_SPCGs')
-prop_df.to_csv(os.path.join(out_path, 'down_flyfactorsurvey_hits_prop.csv'))
+prop_df.to_csv(os.path.join(out_path, 'no_bound_flyfactorsurvey_hits_prop.csv'))
 prop_df = prop_df.sort_values(by = 'num_SPCGs', ascending = False)
 prop_df = prop_df.iloc[0:10, :]
 prop_df = prop_df.sort_values(by = 'num_SPCGs', ascending = True)
@@ -63,7 +63,7 @@ plt.rcParams['font.family'] = 'Arial'
 plt.title('Top frequent TF motifs')
 plt.xlabel('Number of SPCGs with TF motif')
 plt.ylabel('Fly Factor Survey TFs')
-plt.savefig(os.path.join(out_path, 'down_flyfactorssurvey_hits_prop.png'), dpi=300, bbox_inches='tight')
+plt.savefig(os.path.join(out_path, 'no_bound_flyfactorssurvey_hits_prop.png'), dpi=300, bbox_inches='tight')
 
 ##### look at all the TF motifs combined #####
 folder_list = os.listdir(fimo_directory)
@@ -75,7 +75,7 @@ folder_list = [x for x in folder_list if 'untrimmed' not in x]
 TF_list = [x.split("---")[0] for x in folder_list]
 TF_list = [x.split("_")[0] for x in TF_list]
 
-TF_df = pd.DataFrame(index = np.unique(TF_list), columns = down_bound_genes_df['genes'], data = 0)
+TF_df = pd.DataFrame(index = np.unique(TF_list), columns = no_bound_genes_df['genes'], data = 0)
 
 for tmp_folder in folder_list: 
     try:
@@ -85,19 +85,17 @@ for tmp_folder in folder_list:
     fimo_results = fimo_results.loc[fimo_results[7] < p_thresh, :]
     fimo_genes = fimo_results[0]
     fimo_genes = [x.split("_")[0] for x in fimo_genes]
-    fimo_genes = np.intersect1d(fimo_genes, down_bound_genes_df['genes'])
+    fimo_genes = np.intersect1d(fimo_genes, no_bound_genes_df['genes'])
     tmp_gene = tmp_folder.split("_")[0]
     tmp_gene = tmp_gene.split("---")[0]
     TF_df.loc[tmp_gene, fimo_genes] = TF_df.loc[tmp_gene, fimo_genes] + 1
 TF_df[TF_df > 1] = 1
 TF_df.index = conversion_df.loc[TF_df.index, 0] + " (" + conversion_df.loc[TF_df.index, 1] + ")"
 
-TF_df.to_csv(os.path.join(out_path, 'down_flyfactorsurvey_combined_hits.csv'))
+TF_df.to_csv(os.path.join(out_path, 'no_bound_flyfactorsurvey_combined_hits.csv'))
 
 # summarize the results 
 TF_df.sum(axis = 1).sort_values()
 prop_df = pd.DataFrame(data = np.array([TF_df.index, TF_df.sum(axis = 1)]).T, columns = ['TF_motifs', 'num_SPCGs'])
 prop_df = prop_df.sort_values('num_SPCGs')
-prop_df.to_csv(os.path.join(out_path, 'down_flyfactorsurvey_combined_hits_prop.csv'))
-
-##### get the list of genes that are 
+prop_df.to_csv(os.path.join(out_path, 'no_bound_flyfactorsurvey_combined_hits_prop.csv'))
