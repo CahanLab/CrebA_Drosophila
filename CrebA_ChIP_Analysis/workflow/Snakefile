@@ -288,6 +288,18 @@ rule plot_distance_from_tss:
         Rscript plot_distance_crebA.R
         """
 
+rule process_regulatory_regions_bound_genes_400bp: 
+    input: 
+        "../output/tss_table/regulatory_regions.bed", 
+        "../output/find_bound_DE_genes/down_DE.csv", 
+        "../output/find_bound_DE_genes/up_DE.csv"
+    output: 
+        "../output/bound_genes_regulatory_regions_400bp/down_genes_reg_regions.bed",
+        "../output/bound_genes_regulatory_regions_400bp/up_genes_reg_regions.bed"
+    shell: 
+        """
+        python3 process_regulatory_regions_bound_genes_400bp.py
+        """
 
 rule fimo_activated_bound_genes_400: 
     input:
@@ -349,6 +361,14 @@ rule analyze_bound_genes_FIMO_400bp:
         python analyze_FIMO_up_genes_400bp.py 
         python analyze_FIMO_static_genes_400bp.py 
         """
+# write the rule to generate the null sequences 
+rule get_null_400bp_sequences: 
+    input: 
+    output:
+    shell:
+        """
+        python process_regulatory_regions_bound_genes_400bp_null.py 
+        """
 
 # fimo the unbound genes 
 rule fimo_unbound_genes_400: 
@@ -379,3 +399,94 @@ rule fimo_random_genes_400:
         bedtools getfasta -fi {input[2]} -bed {input[1]} -nameOnly > {output[0]}
         bash FIMO_regulatory_regions_flyFactorSurvey_random_genes_400bp.sh
         """
+
+
+# TODO make a rule for this 
+# python process_regulatory_regions_bound_genes_400bp_bg.py 
+
+# run fimo with Drosophila sequence background 
+rule fimo_down_genes_400bg: 
+    input: 
+        "../input/motif_databases.12.23/FLY/fly_factor_survey.meme", 
+        "../output/bound_genes_regulatory_regions_400bp_bg/down_genes_reg_regions.bed",
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        directory("../output/bound_genes_regulatory_regions_400bp_bg/down_genes/"),
+        directory("../output/bound_genes_regulatory_regions_400bp_bg/down_genes/fly_factor_survey/")
+        
+    shell: 
+        """
+        mkdir -p {output[0]}
+        bedtools getfasta -fi {input[2]} -bed {input[1]} -nameOnly > {output[0]}/bound_regulatory_regions_seq.fasta
+        mkdir -p {output[1]}
+
+        fasta-get-markov {output[0]}/bound_regulatory_regions_seq.fasta > {output[0]}/background_model.txt
+        cat ../input/motif_databases.12.23/FLY/fly_factor_survey.meme | grep MOTIF > {output[1]}/motif_database.txt 
+        while read p; do 
+            motif_id=$(echo ${{p}} | cut -d ' ' -f2)
+            motif_name=$(echo ${{p}} | cut -d ' ' -f3)
+            fimo --o {output[1]}/${{motif_id}}---${{motif_name}} --motif ${{motif_id}} --bgfile {output[0]}/background_model.txt ../input/motif_databases.12.23/FLY/fly_factor_survey.meme {output[0]}/bound_regulatory_regions_seq.fasta
+        done < {output[1]}/motif_database.txt
+        """
+
+# look at the up FIMO 
+rule fimo_up_genes_400bg: 
+    input: 
+        "../input/motif_databases.12.23/FLY/fly_factor_survey.meme", 
+        "../output/bound_genes_regulatory_regions_400bp_bg/up_genes_reg_regions.bed",
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        directory("../output/bound_genes_regulatory_regions_400bp_bg/up_genes/"),
+        directory("../output/bound_genes_regulatory_regions_400bp_bg/up_genes/fly_factor_survey/")
+        
+    shell: 
+        """
+        mkdir -p {output[0]}
+        bedtools getfasta -fi {input[2]} -bed {input[1]} -nameOnly > {output[0]}/bound_regulatory_regions_seq.fasta
+        mkdir -p {output[1]}
+
+        fasta-get-markov {output[0]}/bound_regulatory_regions_seq.fasta > {output[0]}/background_model.txt
+        cat ../input/motif_databases.12.23/FLY/fly_factor_survey.meme | grep MOTIF > {output[1]}/motif_database.txt 
+        while read p; do 
+            motif_id=$(echo ${{p}} | cut -d ' ' -f2)
+            motif_name=$(echo ${{p}} | cut -d ' ' -f3)
+            fimo --o {output[1]}/${{motif_id}}---${{motif_name}} --motif ${{motif_id}} --bgfile {output[0]}/background_model.txt ../input/motif_databases.12.23/FLY/fly_factor_survey.meme {output[0]}/bound_regulatory_regions_seq.fasta
+        done < {output[1]}/motif_database.txt
+        """
+
+rule analyze_fimo_genes_400bg: 
+    input: 
+    output: 
+    shell: 
+        """
+        python analyze_FIMO_results.py --bed ../output/bound_genes_regulatory_regions_400bp_bg/down_genes_reg_regions.bed \
+                                       --fimo ../output/bound_genes_regulatory_regions_400bp_bg/down_genes/fly_factor_survey/ \
+                                       --out ../output/bound_genes_regulatory_regions_400bp_bg/down_genes/ \
+                                       --name down_genes
+
+        python analyze_FIMO_results.py --bed ../output/bound_genes_regulatory_regions_400bp_bg/up_genes_reg_regions.bed \
+                                       --fimo ../output/bound_genes_regulatory_regions_400bp_bg/up_genes/fly_factor_survey/ \
+                                       --out ../output/bound_genes_regulatory_regions_400bp_bg/up_genes/ \
+                                       --name up_genes --color '#fc8d62'
+        """
+
+# rule to sg_select_fimo_genes_400bg
+
+rule sg_select_fimo_genes_400bg:
+    input: 
+    output:
+    shell:
+        """
+        python sg_select_fimo_genes_400bg.py --fimo_prop_path ../output/bound_genes_regulatory_regions_400bp_bg/down_genes/down_genes_flyfactorsurvey_hits_prop.csv \
+                                             --output_path ../output/bound_genes_regulatory_regions_400bp_bg/down_genes/ \
+                                             --file_name down \
+                                             --percent_cutoff 0.5
+        
+        python sg_select_fimo_genes_400bg.py --fimo_prop_path ../output/bound_genes_regulatory_regions_400bp_bg/up_genes/up_genes_flyfactorsurvey_hits_prop.csv \
+                                             --output_path ../output/bound_genes_regulatory_regions_400bp_bg/up_genes/ \
+                                             --file_name up \
+                                             --bar_color '#fc8d62' \
+                                             --percent_cutoff 0.5
+                                                                               
+        """
+

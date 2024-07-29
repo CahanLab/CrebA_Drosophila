@@ -48,3 +48,26 @@ for i in range(0, num_trials):
     rand_bed_tab.loc[i, 3] = 'random_sample_' + str(i)
     print(i)
 rand_bed_tab.to_csv(os.path.join(output_path, 'random_reg_regions.bed'), sep = '\t', header = None, index = None)
+
+##### check the TCGA content ##### 
+file_path = '../input/reference_genome/dmel-all-chromosome-r6.33.fasta'
+whole_genome_dict = {}
+whole_genome_dict['A'] = 0
+whole_genome_dict['C'] = 0
+whole_genome_dict['T'] = 0
+whole_genome_dict['G'] = 0
+
+with open(file_path, 'r') as file: 
+    for line in file: 
+        if line.startswith(">"):
+            next
+        else: 
+            #whole_genome = whole_genome + line
+            for s in line.strip(): 
+                if s in whole_genome_dict.keys():
+                    whole_genome_dict[s] += 1
+            print(line)
+
+for nucleotide in whole_genome_dict.keys():
+    print(nucleotide)
+    print(whole_genome_dict[nucleotide] / (whole_genome_dict['A'] + whole_genome_dict['C'] + whole_genome_dict['T'] + whole_genome_dict['G']))
