@@ -32,6 +32,7 @@ def main():
     early_sg_flybase = flybase_convert.loc[early_sg_genes.index, 'flybase']
     fimo_prop['sg_express'] = False
     fimo_prop.loc[fimo_prop['flybase_id'].isin(early_sg_flybase), 'sg_express'] = True
+    fimo_prop = fimo_prop.loc[fimo_prop['flybase_id'] != 'FBgn0004396', :]
 
     selected_fimo = fimo_prop.loc[fimo_prop['sg_express'] == True, :]
     selected_fimo = selected_fimo.sort_values('prop_hits', ascending = False)

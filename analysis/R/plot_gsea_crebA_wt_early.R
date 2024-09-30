@@ -64,6 +64,7 @@ mut_df = compiled_df[compiled_df$type == 'mutant', ]
 ##### make the wildtype plot #####
 color_palette = readRDS(file.path('results', ANALYSIS_VERSION, 'ct_color_palettes/ct_color_palette.rds'))
 sub_wt_df = wt_df[wt_df$celltype %in% c('Salivary Gland', 'Plasmatocytes', 'Amnioserosa', 'Fat Body'), ]
+sub_wt_df$celltype = factor(x = sub_wt_df$celltype, levels = c('Salivary Gland', 'Amnioserosa', 'Plasmatocytes', 'Fat Body'))
 sub_wt_df$pathway = stringr::str_split_fixed(sub_wt_df$pathway, pattern = " \\(", n = 2)[, 1]
 
 p <- ggplot(data = sub_wt_df, aes(y = reorder(pathway, logpval), x = logpval, fill = celltype)) +
@@ -92,6 +93,8 @@ p <- ggplot(data = sub_wt_df, aes(y = reorder(pathway, logpval), x = logpval, fi
 ggsave(filename = file.path(TARGET_dir, 'wildtype_selected_ct.png'), width = 11, height = 10)
 
 sub_mut_df = mut_df[mut_df$celltype %in% c('Salivary Gland', 'Plasmatocytes', 'Amnioserosa', 'Fat Body'), ]
+sub_mut_df$celltype = factor(x = sub_mut_df$celltype, levels = c('Salivary Gland', 'Amnioserosa', 'Plasmatocytes', 'Fat Body'))
+
 sub_mut_df$pathway = stringr::str_split_fixed(sub_mut_df$pathway, pattern = " \\(", n = 2)[, 1]
 
 p <- ggplot(data = sub_mut_df, aes(y = reorder(pathway, logpval), x = logpval, fill = celltype)) +

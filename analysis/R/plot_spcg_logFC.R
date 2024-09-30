@@ -122,7 +122,7 @@ p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', 
   geom_tile() +
   guides(fill = guide_colorbar(title = 'logFC')) +
   scale_fill_gradient2(low = scales::muted("red"), mid = "white", high = scales::muted("blue"), 
-                       midpoint = 0, limits = c(-1.6, 0.5)) +
+                       midpoint = 0, limits = c(min(plot_df$logFC), max(plot_df$logFC))) +
   labs(
     x = 'Secretory Pathway Component Genes',
     y = 'Cell Types'
@@ -137,7 +137,9 @@ p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', 
     panel.spacing = unit(x = 1, units = "lines"),
     strip.background = element_blank()
   ) + 
-  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), axis.text = element_text(size=15), text = element_text(size = 15)) +
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), 
+        axis.text = element_text(size=18), text = element_text(size = 18), 
+        legend.position = 'bottom') +
   ggtitle("Stage 13-16 Embryos")
 ggsave(filename = file.path(TARGET_dir, "stage13-16_logFC.png"), plot = p, width = 31, height = 7)
 

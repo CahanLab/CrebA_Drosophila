@@ -490,3 +490,37 @@ rule sg_select_fimo_genes_400bg:
                                                                                
         """
 
+rule get_500bp_fasta: 
+    input: 
+        "../output/500bp_regions_intersect_peaks/500bp_intersect_peaks.bed", 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output:
+        "../output/500bp_regions_intersect_peaks/500bp_intersect_peaks.fasta"
+    shell: 
+        """
+            python get_500bp_regions_chip_peak.py
+            bedtools getfasta -fi {input[1]} -bed {input[0]} -nameOnly > {output[0]}
+        """
+rule run_500bp_meme: 
+    input: 
+        "../output/500bp_regions_intersect_peaks/500bp_intersect_peaks.fasta"
+    output: 
+        directory("../output/500bp_regions_intersect_peaks/meme_analysis")
+    shell: 
+        """
+        meme {input[0]} -oc {output[0]} -minw 6 -maxw 9 -dna -nmotifs 15
+        """
+
+rule run_raw_fasta: 
+    input: 
+        "../input/reference_genome/dmel-all-chromosome-r6.33.fasta"
+    output: 
+        "../output/500bp_regions_intersect_peaks/raw_intersect_peaks.bed",
+        "../output/500bp_regions_intersect_peaks/raw_intersect_peaks.fasta",
+        directory("../output/500bp_regions_intersect_peaks/raw_meme_analysis")
+    shell: 
+        """
+        python get_raw_regions_chip_peak.py 
+        bedtools getfasta -fi {input[0]} -bed {output[0]} -nameOnly > {output[1]}
+        meme {output[1]} -oc {output[2]} -minw 6 -maxw 16 -nmotifs 20
+        """
