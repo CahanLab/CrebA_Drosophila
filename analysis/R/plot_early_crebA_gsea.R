@@ -1,10 +1,10 @@
-TARGET_dir = file.path("results", ANALYSIS_VERSION, "Figures/plot_gsea_crebA_wt")
+TARGET_dir = file.path("results", ANALYSIS_VERSION, "Figures/plot_early_crebA_gsea")
 dir.create(TARGET_dir)
 
 ##### write a function to automatically get the top 5 categories for each cell type #####
 get_top_cat <- function(ct, top_num = 5) {
-  wt_gsea = read.csv(file.path("results", ANALYSIS_VERSION, "DE_genes_crebA_wt", ct, 'wt_gsea_results.csv'), row.names = 1)
-  mut_gsea = read.csv(file.path("results", ANALYSIS_VERSION, "DE_genes_crebA_wt", ct, 'mut_gsea_results.csv'), row.names = 1)
+  wt_gsea = read.csv(file.path("results", ANALYSIS_VERSION, "early_wt_gsea", ct, 'gsea_results_early_wt.csv'), row.names = 1)
+  mut_gsea = read.csv(file.path("results", ANALYSIS_VERSION, "early_crebA_gsea", ct, 'gsea_results_early_crebA.csv'), row.names = 1)
   
   wt_gsea = wt_gsea[wt_gsea$NES > 0, ]
   mut_gsea = mut_gsea[mut_gsea$NES > 0, ]
@@ -23,7 +23,7 @@ get_top_cat <- function(ct, top_num = 5) {
   return(rbind(wt_gsea, mut_gsea))
 }
 
-ct_list = list.dirs(file.path("results", ANALYSIS_VERSION, 'DE_genes_crebA_wt'), full.names = FALSE, recursive = FALSE)
+ct_list = list.dirs(file.path("results", ANALYSIS_VERSION, 'DE_genes_early_crebA_wt'), full.names = FALSE, recursive = FALSE)
 for(ct in ct_list) {
   plot_df = get_top_cat(ct)
   p <- ggplot(data = plot_df, aes(y = reorder(pathway, logpval), x = logpval, fill = type)) +
@@ -64,7 +64,6 @@ mut_df = compiled_df[compiled_df$type == 'mutant', ]
 ##### make the wildtype plot #####
 color_palette = readRDS(file.path('results', ANALYSIS_VERSION, 'ct_color_palettes/ct_color_palette.rds'))
 sub_wt_df = wt_df[wt_df$celltype %in% c('Salivary Gland', 'Plasmatocytes', 'Amnioserosa', 'Fat Body'), ]
-sub_wt_df$celltype = factor(x = sub_wt_df$celltype, levels = c('Salivary Gland', 'Amnioserosa', 'Plasmatocytes', 'Fat Body'))
 sub_wt_df$pathway = stringr::str_split_fixed(sub_wt_df$pathway, pattern = " \\(", n = 2)[, 1]
 
 p <- ggplot(data = sub_wt_df, aes(y = reorder(pathway, logpval), x = logpval, fill = celltype)) +
@@ -89,11 +88,10 @@ p <- ggplot(data = sub_wt_df, aes(y = reorder(pathway, logpval), x = logpval, fi
     plot.title.position = "plot"
   ) + 
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=0, vjust = 1, hjust=1)) +
-  ggtitle('Geneset enrichment in stage 13-16 wildtype embryos')  
-ggsave(filename = file.path(TARGET_dir, 'wildtype_selected_ct.png'), width = 12, height = 10)
+  ggtitle('Geneset enrichment in stage 10-12 wildtype embryos')  
+ggsave(filename = file.path(TARGET_dir, 'wildtype_selected_ct.png'), width = 11, height = 10)
 
 sub_mut_df = mut_df[mut_df$celltype %in% c('Salivary Gland', 'Plasmatocytes', 'Amnioserosa', 'Fat Body'), ]
-sub_mut_df$celltype = factor(x = sub_mut_df$celltype, levels = c('Salivary Gland', 'Amnioserosa', 'Plasmatocytes', 'Fat Body'))
 sub_mut_df$pathway = stringr::str_split_fixed(sub_mut_df$pathway, pattern = " \\(", n = 2)[, 1]
 
 p <- ggplot(data = sub_mut_df, aes(y = reorder(pathway, logpval), x = logpval, fill = celltype)) +
@@ -118,6 +116,6 @@ p <- ggplot(data = sub_mut_df, aes(y = reorder(pathway, logpval), x = logpval, f
     plot.title.position = "plot"
   ) + 
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=0, vjust = 1, hjust=1)) +
-  ggtitle('Geneset enrichment in stage 13-16 mutant embryos')  
-ggsave(filename = file.path(TARGET_dir, 'mutant_selected_ct.png'), width = 12, height = 10)
+  ggtitle('Geneset enrichment in stage 10-12 mutant embryos')  
+ggsave(filename = file.path(TARGET_dir, 'mutant_selected_ct.png'), width = 11, height = 10)
 

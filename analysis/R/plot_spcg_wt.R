@@ -176,7 +176,7 @@ for(gene_id in c(spcg_tab$seurat_genes, 'CrebA')) {
 }
 
 # get the genes categorized 
-spcg_dot_df = modified_dotPlot_df(wt_object, features = unique(c(spcg_tab$seurat_genes, 'CrebA')), group.by = 'manual_celltypes')
+spcg_dot_df = modified_dotPlot_df(wt_object, features = unique(c(spcg_tab$seurat_genes, 'CrebA')), group.by = 'new_celltypes')
 spcg_dot_df$category = NA
 
 for(temp_gene in unique(spcg_dot_df$features.plot)) { 

@@ -57,6 +57,15 @@ source("R/integrate_early_crebA.R")
 # manual label the early crebA data 
 source("R/manual_label_early_crebA.R")
 
+# find DE genes between different cell types in CrebA 
+source("R/early_crebA_gsea.R")
+
+# find the DE genes betweent different cell types in early wildtype 
+source("R/early_wt_gsea.R")
+
+# plot out the DE genes between different cell types in CrebA 
+source("R/plot_early_crebA_gsea.R")
+
 # find DE genes between the same cell types 
 source("R/DE_genes_early_crebA_wt.R")
 
@@ -69,6 +78,8 @@ source("R/manual_label_crebA.R")
 # find DE genes between the same cell types 
 source("R/DE_genes_crebA_wt.R")
 
+# plot some of the GSEA results 
+source("R/plot_gsea_crebA_wt.R")
 
 ##### make the plotting scripts ######
 
@@ -81,9 +92,6 @@ source("R/plot_celltypes.R")
 # make the plots for the statics of CrebA dataset 
 source("R/plot_crebA_stats.R")
 
-# make the plots of the common cell types 
-source("R/plot_crebA_wt_early_late.R")
-
 # look at the spcg in the wild type data 
 source("R/plot_spcg_wt.R")
 
@@ -92,3 +100,8 @@ source("R/plot_spcg_logFC.R")
 
 # plot out the correlation between logFC and normalized expression of CrebA 
 source("R/plot_logFC_norm_Exp_crebA.R")
+
+###### unused scripts ######
+
+# make the plots of the common cell types 
+source("R/plot_crebA_wt_early_late.R")

@@ -21,12 +21,12 @@ crebA_object = readRDS(file.path('results', ANALYSIS_VERSION, 'manual_annotation
 DimPlot(crebA_object, group.by = 'manual_celltypes', label = TRUE) + 
   scale_color_manual(values =color_palette) + 
   ggtitle("Stage 13-16 CrebA Mutant Embryos")
-ggsave(file.path(TARGET_dir, "stage13-16_embryos_umap.png"), width = 12, height = 8)
+ggsave(file.path(TARGET_dir, "stage13-16_embryos_umap.png"), width = 8.5, height = 8)
 
 DimPlot(crebA_object, group.by = 'manual_celltypes', label = FALSE) + 
   scale_color_manual(values =color_palette) + 
   ggtitle("Stage 13-16 CrebA Mutant Embryos")
-ggsave(file.path(TARGET_dir, "stage13-16_embryos_umap_unlabeled.png"), width = 12, height = 8)
+ggsave(file.path(TARGET_dir, "stage13-16_embryos_umap_unlabeled.png"), width = 8.5, height = 8)
 
 ##### load in stage 10-12 wildtype #####
 wt_object = readRDS(file.path('results', ANALYSIS_VERSION, 'harmonized_wildtype_data/stage10-12_reharmonized_seurat.rds'))
@@ -44,11 +44,11 @@ ggsave(file.path(TARGET_dir, "stage10-12_wt_embryos_umap_unlabeled.png"), width 
 wt_object = readRDS(file.path('results', ANALYSIS_VERSION, 'harmonized_wildtype_data/stage13-16_reharmonized_seurat.rds'))
 DimPlot(wt_object, group.by = 'new_celltypes', label = TRUE) + 
   scale_color_manual(values =color_palette) + 
-  ggtitle("Stage 13-16 WildtypeEmbryos")
+  ggtitle("Stage 13-16 Wildtype Embryos")
 ggsave(file.path(TARGET_dir, "stage13-16_wt_embryos_umap.png"), width = 12, height = 8)
 
 DimPlot(wt_object, group.by = 'new_celltypes', label = FALSE) + 
   scale_color_manual(values =color_palette) + 
-  ggtitle("Stage 13-16 WildtypeEmbryos")
+  ggtitle("Stage 13-16 Wildtype Embryos")
 ggsave(file.path(TARGET_dir, "stage13-16_wt_embryos_umap_unlabeled.png"), width = 12, height = 8)
 
