@@ -141,22 +141,27 @@ rule match_peak_gene:
     input: 
         "../output/range_peak_regions/fkh_sage_intersect.narrowPeak"
     output: 
-        "../output/match_nearest_gene/fkh_sage_intersect_genes.csv"
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv",
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_2000.csv"
     shell: 
         """
         python3 match_nearest_region_to_genes.py --bed {input[0]} --maxLength 1000 --out {output[0]}
+        python3 match_nearest_region_to_genes.py --bed {input[0]} --maxLength 2000 --out {output[1]}
         """
 
+# find the SPCGs that are bound by CrebA 
 rule find_bound_SPCGs: 
     input: 
-        '../input/SPCG_files/SPCG List.xlsx', 
-        "../output/match_nearest_gene/fkh_sage_intersect_genes.csv", 
-        "../output/match_nearest_gene/fkh_sage_unique_genes.csv"
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv",
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_2000.csv"
     output: 
-        "../output/find_bound_SPCGs/spcg_match.csv"
+        "../output/find_bound_SPCGs/spcg_match_1000.csv", 
+        "../output/find_bound_SPCGs/spcg_match_2000.csv"
     shell: 
         """
-        python3 find_bound_SPCGs.py
+        mkdir -p ../output/find_bound_SPCGs
+        python3 find_bound_SPCGs.py --input {input[0]} --output {output[0]}
+        python3 find_bound_SPCGs.py --input {input[1]} --output {output[1]}
         """
 
 rule find_bound_DE_genes: 
