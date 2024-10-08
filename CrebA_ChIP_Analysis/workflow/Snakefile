@@ -82,6 +82,7 @@ rule get_regulatory_regions_SPCGs_fasta:
         bedtools getfasta -fi {input[1]} -bed {input[0]} -nameOnly > {output}
         """
 
+###### let me think if I want to do that 
 # perform FIMO on SPCGs' regulatory regions 
 rule FIMO_regulatory_regions_flyFactorSurvey_SPCGs: 
     input: 
@@ -101,42 +102,28 @@ rule summarize_SPCGs_FIMO_regions_results:
         """
         python3 analyze_FIMO_SPCGs.py
         """
+##### END 
 
-
-##### trim peak regions to be 500 +/- around the peak and get the intersecting peaks ######
-# trim the peak regions to be 500 +/- around the peak 
+##### trim peak regions to be 250 +/- around the peak and get the intersecting peaks ######
+# trim the peak regions to be 250 +/- around the peak 
 rule trim_range_peaks: 
     input: 
         "../input/GEO_processed/GSM4213092_oregon_CrebA_peaks.narrowPeak",
-        "../input/intersect_peaks/Set1.NEW_OR_fkh_sage_intersection_fromDA.bed", 
         "../input/GEO_processed/GSM4213094_fkh_CrebA_peaks.narrowPeak",
         "../input/GEO_processed/GSM4213096_sage_CrebA_peaks.narrowPeak"
     output: 
-        "../output/range_peak_regions/oregon_fkh_sage_intersect.narrowPeak",
         "../output/range_peak_regions/CrebA_oregon.narrowPeak", 
         "../output/range_peak_regions/CrebA_fkh.narrowPeak",
         "../output/range_peak_regions/CrebA_sage.narrowPeak"
     shell: 
         """
         mkdir -p ../output/range_peak_regions/
-        python trim_peaks_range.py
+        python trim_peaks_range.py --range 250 --bed {input[0]} --out {output[0]}
+        python trim_peaks_range.py --range 250 --bed {input[1]} --out {output[1]}
+        python trim_peaks_range.py --range 250 --bed {input[2]} --out {output[2]}
         """
 
-# get the all unique peaks between fkh and sage ChIP-seq 
-# get peaks that are more than 250 bps apart 
-rule find_fkh_sage_peaks: 
-    input: 
-        "../output/range_peak_regions/CrebA_fkh.narrowPeak", 
-        "../output/range_peak_regions/CrebA_sage.narrowPeak"
-    output: 
-        "../output/range_peak_regions/sage_contrast_fkh.narrowPeak",
-        "../output/range_peak_regions/fkh_sage_unique.narrowPeak"
-    shell: 
-        """
-        bedtools intersect -a {input[1]} -b {input[0]} -f 0.5 -v > {output[0]}
-        cat {input[0]} {output[0]} > {output[1]}
-        """
-
+# find sage intersecting fkh ChIP-seq 
 rule find_fkh_sage_intersect_peaks: 
     input: 
         "../output/range_peak_regions/CrebA_fkh.narrowPeak", 
@@ -145,19 +132,19 @@ rule find_fkh_sage_intersect_peaks:
         "../output/range_peak_regions/fkh_sage_intersect.narrowPeak"
     shell: 
         """
-        bedtools intersect -a {input[1]} -b {input[0]} -f 0.25 -u -wa > {output}  
+        bedtools intersect -a {input[1]} -b {input[0]} -f 0.5 -u -wa > {output}  
         """
 
 ##### match the peaks to a gene ######
 # match the peak to a gene 
 rule match_peak_gene: 
     input: 
-        "../output/range_peak_regions/fkh_sage_intersect.narrowPeak", 
-        "../output/range_peak_regions/fkh_sage_unique.narrowPeak"
+        "../output/range_peak_regions/fkh_sage_intersect.narrowPeak"
     output: 
+        "../output/match_nearest_gene/fkh_sage_intersect_genes.csv"
     shell: 
         """
-        python3 match_nearest_region_to_genes_range.py
+        python3 match_nearest_region_to_genes.py --bed {input[0]} --maxLength 1000 --out {output[0]}
         """
 
 rule find_bound_SPCGs: 

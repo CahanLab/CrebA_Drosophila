@@ -10,11 +10,16 @@ if os.path.isdir(output_path) == False:
 ##### this is the function to reproduce data ##### 
 def find_bound_in_region_genes(peak_path, DE_path):
     narrow_peaks = pd.read_csv(peak_path, index_col=0)
-    narrow_peaks = narrow_peaks.loc[narrow_peaks['in_region_gene'].isna() == False, :]
-    bound_genes = list()
-    for i in narrow_peaks.index: 
-        bound_genes = bound_genes + narrow_peaks.loc[i, 'in_region_gene'].split(",")
-        
+    concatenated_array = np.concatenate((np.array(narrow_peaks['nearest_gene_1'].dropna()), np.array(narrow_peaks['nearest_gene_2'].dropna())))
+    concatenated_array = np.unique(concatenated_array)
+    concatenated_array = list(concatenated_array)
+    for element in concatenated_array:
+        # Split the string by whitespace
+        split_elements = element.split(",")
+        if len(split_elements) > 1:
+            concatenated_array.extend(split_elements)
+            concatenated_array.remove(element)
+    bound_genes = concatenated_array
     output_df = pd.DataFrame(index = ['manual_bound_all', 'manual_unbound_all', 'manual_bound_SG', 'manual_unbound_SG'], columns = ['down_genes', 'up_genes', 'static_genes'])
     for i in range(0, 3): 
         if i == 0: 
@@ -55,35 +60,20 @@ output_df = find_bound_in_region_genes(peak_path, DE_path)
 print(output_df)
 
 narrow_peaks = pd.read_csv(peak_path, index_col=0)
-narrow_peaks = narrow_peaks.loc[narrow_peaks['in_region_gene'].isna() == False, :]
-print(narrow_peaks.shape[0])
-bound_genes = list()
-for i in narrow_peaks.index: 
-    bound_genes = bound_genes + narrow_peaks.loc[i, 'in_region_fly_id'].split(",")
-bound_genes = np.unique(bound_genes)
-print(len(bound_genes))
+concatenated_array = np.concatenate((np.array(narrow_peaks['nearest_fly_id_1'].dropna()), np.array(narrow_peaks['nearest_fly_id_2'].dropna())))
+concatenated_array = np.unique(concatenated_array)
+concatenated_array = list(concatenated_array)
+for element in concatenated_array:
+    # Split the string by whitespace
+    split_elements = element.split(",")
+    if len(split_elements) > 1:
+        concatenated_array.extend(split_elements)
+        concatenated_array.remove(element)
+
+bound_genes = concatenated_array
 
 spcg_df['fkh_sage_intersect_peaks_bound'] = False
 spcg_df.loc[spcg_df['Drosophila FBgn'].isin(bound_genes), 'fkh_sage_intersect_peaks_bound'] = True
 np.sum(spcg_df['Drosophila FBgn'].isin(bound_genes)) / spcg_df.shape[0]
 
-##### +/- 1kb fkh sage unique ##### 
-peak_path = "../output/match_nearest_gene/fkh_sage_unique_genes.csv"
-DE_path = "../input/manual_curated_DE_genes/manual_curated_DE.xlsx"
-output_df = find_bound_in_region_genes(peak_path, DE_path)
-print(output_df)
-
-narrow_peaks = pd.read_csv(peak_path, index_col=0)
-narrow_peaks = narrow_peaks.loc[narrow_peaks['in_region_gene'].isna() == False, :]
-print(narrow_peaks.shape[0])
-bound_genes = list()
-for i in narrow_peaks.index: 
-    bound_genes = bound_genes + narrow_peaks.loc[i, 'in_region_fly_id'].split(",")
-bound_genes = np.unique(bound_genes)
-print(len(bound_genes))
-
-spcg_df['fkh_sage_unique_peaks_bound'] = False
-spcg_df.loc[spcg_df['Drosophila FBgn'].isin(bound_genes), 'fkh_sage_unique_peaks_bound'] = True
-np.sum(spcg_df['Drosophila FBgn'].isin(bound_genes)) / spcg_df.shape[0]
-
-spcg_df.to_csv(os.path.join(output_path, "spcg_match.csv"))
+sub_narrow = narrow_peaks.loc[narrow_peaks['nearest_fly_id_1'].isin(spcg_df['Drosophila FBgn']), :]
