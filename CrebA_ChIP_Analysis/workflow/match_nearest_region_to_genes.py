@@ -51,9 +51,6 @@ for i in narrow_peaks.index:
     sub_promoter_tss = sub_promoter_tss.loc[sub_promoter_tss['chrom'] == temp_chrom, :].copy()
     sub_promoter_tss['in_region'] = np.logical_and(sub_promoter_tss['tss'] >= start_pos, sub_promoter_tss['tss'] <= end_pos)
     
-    #sub_promoter_tss['down_dist'] = (narrow_peaks.loc[i, 2] - 250) - sub_promoter_tss['tss']
-    #sub_promoter_tss['up_dist'] = sub_promoter_tss['tss'] - (narrow_peaks.loc[i, 2] - 250)
-
     sub_promoter_tss['down_dist'] = (int(narrow_peaks.loc[i, 1]) + int(narrow_peaks.loc[i, 9])) - sub_promoter_tss['tss']
     sub_promoter_tss['up_dist'] = sub_promoter_tss['tss'] - (int(narrow_peaks.loc[i, 1]) + int(narrow_peaks.loc[i, 9]))
     

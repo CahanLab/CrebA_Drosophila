@@ -17,10 +17,10 @@ if os.path.isdir(output_path) == False:
 # save the MA DE genes in the data first 
 for tmp_type in ['up', 'down']:
     if tmp_type == 'up':
-        sub_ma_DE = ma_DE.loc[np.logical_and(ma_DE['p-value(Genotype)'] < 0.05, ma_DE['CrebA vs. WT linear FC'] > 1.5), :]
+        sub_ma_DE = ma_DE.loc[np.logical_and(ma_DE['p-value(Genotype)'] < 0.05, ma_DE['CrebA vs. WT linear FC'] > 1.25), :]
         sub_sc_DE = sc_DE.loc[np.logical_and(sc_DE['logFC'] > 0.15, sc_DE['padj'] < 0.05), :]
     else:
-        sub_ma_DE = ma_DE.loc[np.logical_and(ma_DE['p-value(Genotype)'] < 0.05, ma_DE['CrebA vs. WT linear FC'] < -1.5), :]
+        sub_ma_DE = ma_DE.loc[np.logical_and(ma_DE['p-value(Genotype)'] < 0.05, ma_DE['CrebA vs. WT linear FC'] < -1.25), :]
         sub_sc_DE = sc_DE.loc[np.logical_and(sc_DE['logFC'] < -0.15, sc_DE['pval'] < 0.05), :]      
     sc_genes = np.array(sub_sc_DE['feature'])
     ma_genes = []
