@@ -164,10 +164,10 @@ rule find_bound_SPCGs:
         python3 find_bound_SPCGs.py --input {input[1]} --output {output[1]}
         """
 
+# the rule to find bound DE genes 
 rule find_bound_DE_genes: 
     input: 
-        "../output/match_nearest_gene/fkh_sage_unique_genes.csv",
-        "../output/match_nearest_gene/fkh_sage_intersect_genes.csv"
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
     output: 
     shell: 
         """
@@ -180,7 +180,7 @@ rule plot_intersect_bound_genes:
         "../output/find_bound_DE_genes/down_DE.csv",
         "../output/find_bound_DE_genes/up_DE.csv",
         "../output/find_bound_SPCGs/spcg_match.csv",
-        "../output/match_nearest_gene/fkh_sage_intersect_genes.csv"
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
     output: 
         "../output/bound_spcg_DE_venn/bound_SPCGs_down_venn.png", 
         "../output/bound_spcg_DE_venn/bound_SPCGs_scdown_venn.png", 
@@ -189,9 +189,24 @@ rule plot_intersect_bound_genes:
         "../output/bound_spcg_DE_venn/bound_down_up_venn.png",
     shell: 
         """
-        python3 plot_intersect_Bound_genes.py
+        python3 plot_intersect_bound_genes.py
         """
 
+rule plot_distance_from_tss: 
+    input: 
+        '../output/match_nearest_gene/fkh_sage_intersect_genes.csv',
+        "../output/tss_table/regulatory_regions_table.txt",
+        "../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv",
+        "../output/find_bound_DE_genes/down_DE.csv",
+        "../output/find_bound_DE_genes/up_DE.csv"
+    output: 
+        directory('../output/plot_location_crebA_binding')
+    shell: 
+        """
+        Rscript plot_distance_crebA.R
+        """
+
+###### we look at those later ######
 rule process_regulatory_regions_bound_genes: 
     input: 
         "../output/tss_table/regulatory_regions.bed", 
@@ -264,20 +279,6 @@ rule analyze_bound_genes_FIMO:
         python analyze_FIMO_down_genes.py 
         python analyze_FIMO_up_genes.py 
         python analyze_FIMO_static_genes.py 
-        """
-
-rule plot_distance_from_tss: 
-    input: 
-        '../output/match_nearest_gene/fkh_sage_intersect_genes.csv',
-        "../output/tss_table/regulatory_regions_table.txt",
-        "../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv",
-        "../output/find_bound_DE_genes/down_DE.csv",
-        "../output/find_bound_DE_genes/up_DE.csv"
-    output: 
-        directory('../output/plot_location_crebA_binding')
-    shell: 
-        """
-        Rscript plot_distance_crebA.R
         """
 
 rule process_regulatory_regions_bound_genes_400bp: 
