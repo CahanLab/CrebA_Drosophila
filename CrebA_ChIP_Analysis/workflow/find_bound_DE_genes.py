@@ -17,7 +17,7 @@ if os.path.isdir(output_path) == False:
 # save the MA DE genes in the data first 
 for tmp_type in ['up', 'down']:
     if tmp_type == 'up':
-        sub_ma_DE = ma_DE.loc[np.logical_and(ma_DE['p-value(Genotype)'] < 0.05, ma_DE['CrebA vs. WT linear FC'] > 1.25), :]
+        sub_ma_DE = ma_DE.loc[np.logical_and(ma_DE['p-value(Genotype)'] < 0.05, ma_DE['CrebA vs. WT linear FC'] > 1.25), :] # might have to change the threshold a little bit 
         sub_sc_DE = sc_DE.loc[np.logical_and(sc_DE['logFC'] > 0.15, sc_DE['padj'] < 0.05), :]
     else:
         sub_ma_DE = ma_DE.loc[np.logical_and(ma_DE['p-value(Genotype)'] < 0.05, ma_DE['CrebA vs. WT linear FC'] < -1.25), :]
@@ -29,6 +29,7 @@ for tmp_type in ['up', 'down']:
     sub_ma_DE['in_new_transcriptome'] = np.array(sub_ma_DE['Gene Symbol'].isin(np.array(promoter_tab[6])))
     sub_ma_DE.to_csv(os.path.join(output_path, tmp_type + '_ma_DE.csv'))
 
+# get all the DE genes from scRNA-seq, microarra and in-situ data 
 up_MA_nate = pd.read_csv("../input/nate_ma_DE/up_ma_DE_TranslatedNate.csv", index_col = 0)
 down_MA_nate = pd.read_csv("../input/nate_ma_DE/down_ma_DE_TranslatedNate.csv", index_col = 0)
 full_MA_nate = pd.concat([up_MA_nate, down_MA_nate], axis = 0)

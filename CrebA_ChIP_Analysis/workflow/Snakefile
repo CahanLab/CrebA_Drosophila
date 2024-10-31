@@ -135,3 +135,60 @@ rule plot_distance_from_tss:
         Rscript plot_distance_crebA.R
         """
 
+rule get_functional_peak_regions: 
+    input: 
+        '../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv', 
+        '../output/find_bound_DE_genes/down_DE.csv', 
+        '../output/find_bound_DE_genes/up_DE.csv', 
+        '../input/SPCG_files/SPCG List.xlsx'
+    output: 
+        '../output/get_functional_peak_regions/full_peaks.bed', 
+        '../output/get_functional_peak_regions/down_DE_peaks.bed', 
+        '../output/get_functional_peak_regions/up_DE_peaks.bed', 
+        '../output/get_functional_peak_regions/spcg_peaks.bed'
+    shell:
+        """
+        mkdir -p ../output/get_functional_peak_regions
+        python3 get_functional_peak_beds.py --bed {input[0]} --out {output[0]}
+        python3 get_functional_peak_beds.py --bed {input[0]} --DE_genes {input[1]} --out {output[1]}
+        python3 get_functional_peak_beds.py --bed {input[0]} --DE_genes {input[2]} --out {output[2]}
+        python3 get_functional_peak_beds.py --bed {input[0]} --spcg ../input/SPCG_files/SPCG\ List.xlsx --out {output[3]}
+        """
+
+rule get_functional_peak_regions_fasta: 
+    input:
+        '../output/get_functional_peak_regions/full_peaks.bed', 
+        '../output/get_functional_peak_regions/down_DE_peaks.bed', 
+        '../output/get_functional_peak_regions/up_DE_peaks.bed', 
+        '../output/get_functional_peak_regions/spcg_peaks.bed'
+    output: 
+        '../output/get_functional_peak_regions/full_peaks.fasta', 
+        '../output/get_functional_peak_regions/down_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions/up_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions/spcg_peaks.fasta'
+    shell:
+        """
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[0]} -nameOnly > {output[0]}
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[1]} -nameOnly > {output[1]}
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[2]} -nameOnly > {output[2]}
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[3]} -nameOnly > {output[3]}
+        """
+ 
+rule dreme_functional_peak_regions: 
+    input: 
+        '../output/get_functional_peak_regions/down_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions/up_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions/spcg_peaks.fasta', 
+        '../output/get_functional_peak_regions/full_peaks.fasta'
+    output: 
+        directory("../output/get_functional_peak_regions/down_DE_peaks"), 
+        directory("../output/get_functional_peak_regions/up_DE_peaks"), 
+        directory("../output/get_functional_peak_regions/spcg_peaks"), 
+        directory('../output/get_functional_peak_regions/full_peaks')
+    shell: 
+        """
+        dreme -p {input[0]} -o {output[0]} 
+        dreme -p {input[1]} -o {output[1]}
+        dreme -p {input[2]} -o {output[2]} 
+        dreme -p {input[3]} -o {output[3]} 
+        """

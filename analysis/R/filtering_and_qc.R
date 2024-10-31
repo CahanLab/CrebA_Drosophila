@@ -100,7 +100,7 @@ withr::with_dir(file.path(RESULTS, "before_cleaning"), {
   if('markers.csv' %in% list.files()) { 
     markers = read.csv("markers.csv", row.names = 1)
   } else { 
-    markers = FindAllMarkers(object, method = "bimod")
+    markers = FindAllMarkers(object)
     write.csv(markers, "markers.csv")
   }
 

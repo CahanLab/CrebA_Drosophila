@@ -101,6 +101,9 @@ source("R/plot_spcg_logFC.R")
 # plot out the correlation between logFC and normalized expression of CrebA 
 source("R/plot_logFC_norm_Exp_crebA.R")
 
+# check interested genes 
+source("R/check_genes_UMAP.R")
+
 ###### unused scripts ######
 
 # make the plots of the common cell types 
