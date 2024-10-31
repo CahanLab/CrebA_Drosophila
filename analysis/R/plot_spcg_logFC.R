@@ -107,20 +107,17 @@ for(tmp_ct in ct_list) {
   plot_df = rbind(plot_df, mut_DE_genes)
 }
 
-
-sub_exp_order = plot_df %>% 
-  group_by(celltype) %>%
-  summarize(sum_logfc = sum(logFC))
-sub_exp_order = sub_exp_order[order(sub_exp_order$sum_logfc, decreasing = TRUE), ]
+sub_exp_order = plot_df[plot_df$feature == 'CrebA', ]
+sub_exp_order = sub_exp_order[order(sub_exp_order$logFC, decreasing = TRUE), ]
 
 plot_df$celltype = factor(plot_df$celltype, levels = sub_exp_order$celltype)
-plot_df$spcg_cat = factor(plot_df$spcg_cat, levels = unique(spcg_tab$`SPCG General Functional Categories`))
+plot_df$spcg_cat = factor(plot_df$spcg_cat, levels = c("CrebA", unique(spcg_tab$`SPCG General Functional Categories`)[unique(spcg_tab$`SPCG General Functional Categories`) != 'CrebA']))
 plot_df = plot_df[plot_df$spcg_cat != 'Prolyl hydroxylation', ]
 
 write.csv(plot_df, file = file.path(TARGET_dir, 'stage13-16_logFC.csv'))
 p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', fill = 'logFC')) +
   geom_tile() +
-  guides(fill = guide_colorbar(title = 'logFC')) +
+  guides(fill = guide_colorbar(title = 'logFC', barwidth=30)) +
   scale_fill_gradient2(low = scales::muted("red"), mid = "white", high = scales::muted("blue"), 
                        midpoint = 0, limits = c(min(plot_df$logFC), max(plot_df$logFC))) +
   labs(
