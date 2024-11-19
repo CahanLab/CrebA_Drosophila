@@ -104,6 +104,9 @@ source("R/plot_logFC_norm_Exp_crebA.R")
 # check interested genes 
 source("R/check_genes_UMAP.R")
 
+# look at the secretome in wildtype data 
+source("R/plot_secretome_wt.R")
+
 ###### unused scripts ######
 
 # make the plots of the common cell types 
