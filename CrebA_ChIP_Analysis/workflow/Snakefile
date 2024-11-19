@@ -68,14 +68,17 @@ rule find_fkh_sage_intersect_peaks:
 # match the peak to a gene 
 rule match_peak_gene: 
     input: 
-        "../output/range_peak_regions/fkh_sage_intersect.narrowPeak"
+        "../output/range_peak_regions/fkh_sage_intersect.narrowPeak", 
+        "../output/range_peak_regions/CrebA_oregon.narrowPeak"
     output: 
         "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv",
-        "../output/match_nearest_gene/fkh_sage_intersect_genes_2000.csv"
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_2000.csv", 
+        "../output/match_nearest_gene/oregon_genes_1000.csv"
     shell: 
         """
         python3 match_nearest_region_to_genes.py --bed {input[0]} --maxLength 1000 --out {output[0]}
         python3 match_nearest_region_to_genes.py --bed {input[0]} --maxLength 2000 --out {output[1]}
+        python3 match_nearest_region_to_genes.py --bed {input[1]} --maxLength 1000 --out {output[2]}
         """
 
 # find the SPCGs that are bound by CrebA 
@@ -98,33 +101,51 @@ rule find_bound_DE_genes:
     input: 
         "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
     output: 
+        directory("../output/find_bound_DE_genes")
     shell: 
         """
-        python3 find_bound_DE_genes.py
-        Rscript enrichment_categorized_DE_genes.R
+        python3 find_bound_DE_genes.py --boundGenes {input[0]} --cts "Salivary Gland" --out {output[0]}
+        # Rscript enrichment_categorized_DE_genes.R
         """
 
 rule plot_intersect_bound_genes: 
     input: 
         "../output/find_bound_DE_genes/down_DE.csv",
         "../output/find_bound_DE_genes/up_DE.csv",
-        "../output/find_bound_SPCGs/spcg_match.csv",
+        "../output/find_bound_SPCGs/spcg_match_1000.csv",
         "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
     output: 
+        "../output/bound_spcg_DE_venn/bound_down_up_venn.png", 
+        "../output/bound_spcg_DE_venn/bound_SPCGs_down_sc_insitu_venn_sg.png", 
+        "../output/bound_spcg_DE_venn/bound_SPCGs_down_sc_venn_sg.png", 
         "../output/bound_spcg_DE_venn/bound_SPCGs_down_venn.png", 
-        "../output/bound_spcg_DE_venn/bound_SPCGs_scdown_venn.png", 
-        "../output/bound_spcg_DE_venn/bound_SPCGs_up_venn.png", 
-        "../output/bound_spcg_DE_venn/bound_SPCGs_scup_venn.png", 
-        "../output/bound_spcg_DE_venn/bound_down_up_venn.png",
+        "../output/bound_spcg_DE_venn/bound_SPCGs_up_venn_sg.png",
+        "../output/bound_spcg_DE_venn/bound_SPCGs_up_venn.png",
+        "../output/bound_spcg_DE_venn/ma_down-sc_down-insitu.png",
+        "../output/bound_spcg_DE_venn/ma_down-sc_down-SPCGs.png",
+        "../output/bound_spcg_DE_venn/ma_up-sc_up-SPCGs.png"
     shell: 
         """
         python3 plot_intersect_bound_genes.py
         """
 
+rule get_all_bound_genes: 
+    input: 
+        "../output/find_bound_DE_genes/down_DE.csv",
+        "../output/find_bound_DE_genes/up_DE.csv",
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
+    output: 
+        "../output/get_all_bound_genes/all_bound_genes_data.csv"
+    shell: 
+        """
+        mkdir -p ../output/get_all_bound_genes/
+        python3 get_all_bound_genes.py 
+        """
+
 rule plot_distance_from_tss: 
     input: 
-        '../output/match_nearest_gene/fkh_sage_intersect_genes.csv',
-        "../output/tss_table/regulatory_regions_table.txt",
+        '../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv',
+        "../output/tss_table/tss_table.txt",
         "../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv",
         "../output/find_bound_DE_genes/down_DE.csv",
         "../output/find_bound_DE_genes/up_DE.csv"
@@ -157,12 +178,10 @@ rule get_functional_peak_regions:
 
 rule get_functional_peak_regions_fasta: 
     input:
-        '../output/get_functional_peak_regions/full_peaks.bed', 
         '../output/get_functional_peak_regions/down_DE_peaks.bed', 
         '../output/get_functional_peak_regions/up_DE_peaks.bed', 
         '../output/get_functional_peak_regions/spcg_peaks.bed'
     output: 
-        '../output/get_functional_peak_regions/full_peaks.fasta', 
         '../output/get_functional_peak_regions/down_DE_peaks.fasta', 
         '../output/get_functional_peak_regions/up_DE_peaks.fasta', 
         '../output/get_functional_peak_regions/spcg_peaks.fasta'
@@ -171,24 +190,240 @@ rule get_functional_peak_regions_fasta:
         bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[0]} -nameOnly > {output[0]}
         bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[1]} -nameOnly > {output[1]}
         bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[2]} -nameOnly > {output[2]}
-        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[3]} -nameOnly > {output[3]}
         """
  
 rule dreme_functional_peak_regions: 
     input: 
         '../output/get_functional_peak_regions/down_DE_peaks.fasta', 
         '../output/get_functional_peak_regions/up_DE_peaks.fasta', 
-        '../output/get_functional_peak_regions/spcg_peaks.fasta', 
-        '../output/get_functional_peak_regions/full_peaks.fasta'
+        '../output/get_functional_peak_regions/spcg_peaks.fasta'
     output: 
-        directory("../output/get_functional_peak_regions/down_DE_peaks"), 
-        directory("../output/get_functional_peak_regions/up_DE_peaks"), 
-        directory("../output/get_functional_peak_regions/spcg_peaks"), 
-        directory('../output/get_functional_peak_regions/full_peaks')
+        directory("../output/get_functional_peak_regions/dreme_down_DE_peaks"), 
+        directory("../output/get_functional_peak_regions/dreme_up_DE_peaks"), 
+        directory("../output/get_functional_peak_regions/dreme_spcg_peaks")
     shell: 
         """
         dreme -p {input[0]} -o {output[0]} 
         dreme -p {input[1]} -o {output[1]}
         dreme -p {input[2]} -o {output[2]} 
-        dreme -p {input[3]} -o {output[3]} 
+        """
+
+rule tomtom_functional_peak_regions: 
+    input: 
+        "../output/get_functional_peak_regions/dreme_down_DE_peaks/dreme.txt", 
+        "../output/get_functional_peak_regions/dreme_up_DE_peaks/dreme.txt",
+        "../output/get_functional_peak_regions/dreme_spcg_peaks/dreme.txt"
+    output: 
+        directory("../output/get_functional_peak_regions/tomtom_down_DE_peaks"),
+        directory("../output/get_functional_peak_regions/tomtom_up_DE_peaks"),
+        directory("../output/get_functional_peak_regions/tomtom_spcg_peaks")
+    shell: 
+        """
+        tomtom {input[0]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[0]}
+        tomtom {input[1]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[1]}
+        tomtom {input[2]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[2]}
+        """
+
+rule fimo_functional_peak_regions: 
+    input: 
+        '../output/get_functional_peak_regions/down_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions/up_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions/spcg_peaks.fasta'
+    output: 
+        directory("../output/get_functional_peak_regions/fimo_down_DE_peaks"), 
+        directory("../output/get_functional_peak_regions/fimo_up_DE_peaks"), 
+        directory("../output/get_functional_peak_regions/fimo_spcg_peaks")
+    shell: 
+        """
+        fimo --o {output[0]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme {input[0]}
+        fimo --o {output[1]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme {input[1]}
+        fimo --o {output[2]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme {input[2]}
+        """
+
+
+# this is to generate the non-functional peaks -- serves as a null 
+rule get_nonfunctional_peak_regions:
+    input: 
+        '../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv',
+        '../output/find_bound_DE_genes/down_DE.csv',
+        '../output/find_bound_DE_genes/up_DE.csv', 
+        '../input/early_sg_DE_genes/markers_genes_early_SG.csv'
+    output: 
+        '../output/get_nonfunctional_peak_regions/nonfunctional_peaks.bed', 
+        '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.bed', 
+        '../output/get_nonfunctional_peak_regions/300_top_nonfunctional_peaks.bed'
+    shell:
+        """
+        mkdir -p ../output/get_nonfunctional_peak_regions
+        python3 get_nonfunctional_peak_beds.py --bed {input[0]} --DE_genes_down {input[1]} --DE_genes_up {input[2]} --out {output[0]}
+        python3 get_nonfunctional_peak_beds.py --bed {input[0]} --DE_genes_down {input[1]} --DE_genes_up {input[2]} --scRNA_results {input[3]} --num_genes 150 --out {output[1]}
+        python3 get_nonfunctional_peak_beds.py --bed {input[0]} --DE_genes_down {input[1]} --DE_genes_up {input[2]} --scRNA_results {input[3]} --num_genes 300 --out {output[2]}
+        """
+
+rule get_nonfunctional_peak_regions_fasta: 
+    input:
+        '../output/get_nonfunctional_peak_regions/nonfunctional_peaks.bed', 
+        '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.bed', 
+        '../output/get_nonfunctional_peak_regions/300_top_nonfunctional_peaks.bed'
+    output: 
+        '../output/get_nonfunctional_peak_regions/nonfunctional_peaks.fasta',
+        '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.fasta', 
+        '../output/get_nonfunctional_peak_regions/300_top_nonfunctional_peaks.fasta'
+    shell:
+        """
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[0]} -nameOnly > {output[0]}
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[1]} -nameOnly > {output[1]}
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[2]} -nameOnly > {output[2]}
+        """
+
+rule dreme_nonfunctional_peak_regions: 
+    input: 
+        '../output/get_nonfunctional_peak_regions/nonfunctional_peaks.fasta', 
+        '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.fasta', 
+        '../output/get_nonfunctional_peak_regions/300_top_nonfunctional_peaks.fasta'
+    output: 
+        directory("../output/get_nonfunctional_peak_regions/dreme_nonfunctional_peaks"), 
+        directory("../output/get_nonfunctional_peak_regions/dreme_150_top_nonfunctional_peaks"), 
+        directory("../output/get_nonfunctional_peak_regions/dreme_300_top_nonfunctional_peaks")
+    shell: 
+        """
+        dreme -p {input[0]} -o {output[0]} 
+        dreme -p {input[1]} -o {output[1]}
+        dreme -p {input[2]} -o {output[2]}
+        """
+
+rule tomtom_nonfunctional_peak_regions: 
+    input: 
+        "../output/get_nonfunctional_peak_regions/dreme_nonfunctional_peaks/dreme.txt", 
+        "../output/get_nonfunctional_peak_regions/dreme_150_top_nonfunctional_peaks/dreme.txt", 
+        "../output/get_nonfunctional_peak_regions/dreme_300_top_nonfunctional_peaks/dreme.txt"
+    output: 
+        directory("../output/get_nonfunctional_peak_regions/tomtom_nonfunctional_peaks"),
+        directory("../output/get_nonfunctional_peak_regions/tomtom_150_top_nonfunctional_peaks"), 
+        directory("../output/get_nonfunctional_peak_regions/tomtom_300_top_nonfunctional_peaks")
+    shell: 
+        """
+        tomtom {input[0]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[0]}
+        tomtom {input[1]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[1]}
+        tomtom {input[2]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[2]}
+        """
+
+rule fimo_nonfunctional_peak_regions: 
+    input: 
+        '../output/get_nonfunctional_peak_regions/nonfunctional_peaks.fasta', 
+        '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.fasta'
+    output: 
+        directory("../output/get_nonfunctional_peak_regions/fimo_nonfunctional_peaks"),
+        directory("../output/get_nonfunctional_peak_regions/fimo_150_top_nonfunctional_peaks")
+    shell: 
+        """
+        fimo --o {output[0]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme {input[0]}
+        fimo --o {output[1]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme {input[1]}
+        """
+
+###### combine all DE genes from big 4 CTs ######
+# the rule to find bound DE genes 
+rule find_bound_DE_genes_4cts: 
+    input: 
+        "../output/match_nearest_gene/oregon_genes_1000.csv"
+    output: 
+        directory("../output/find_bound_DE_genes_4cts")
+    shell: 
+        """
+        python3 find_bound_DE_genes.py --boundGenes {input[0]} --cts "Salivary Gland" "Amnioserosa" "Plasmatocytes" "Fat Body" --out {output[0]}
+        #Rscript enrichment_categorized_DE_genes_4cts.R
+        """
+
+rule plot_intersect_bound_genes_4cts: 
+    input: 
+        "../output/find_bound_DE_genes_4cts/down_DE.csv",
+        "../output/find_bound_DE_genes_4cts/up_DE.csv",
+        "../output/match_nearest_gene/oregon_intersect_genes_1000.csv"
+    output: 
+
+    shell: 
+        """
+        python3 plot_intersect_bound_genes_4cts.py
+        """
+
+rule plot_distance_from_tss_4cts: 
+    input: 
+        '../output/match_nearest_gene/oregon_intersect_genes_1000.csv',
+        "../output/tss_table/tss_table.txt",
+        "../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv",
+        "../output/find_bound_DE_genes/down_DE.csv",
+        "../output/find_bound_DE_genes/up_DE.csv"
+    output: 
+        directory('../output/plot_location_crebA_binding')
+    shell: 
+        """
+        Rscript plot_distance_crebA_4cts.R
+        """
+
+rule get_functional_peak_regions_4cts: 
+    input: 
+        '../output/match_nearest_gene/oregon_intersect_genes_1000.csv', 
+        '../output/find_bound_DE_genes_4cts/down_DE.csv', 
+        '../output/find_bound_DE_genes_4cts/up_DE.csv', 
+        '../input/SPCG_files/SPCG List.xlsx'
+    output: 
+        '../output/get_functional_peak_regions_4cts/full_peaks.bed', 
+        '../output/get_functional_peak_regions_4cts/down_DE_peaks.bed', 
+        '../output/get_functional_peak_regions_4cts/up_DE_peaks.bed', 
+        '../output/get_functional_peak_regions_4cts/spcg_peaks.bed'
+    shell:
+        """
+        mkdir -p ../output/get_functional_peak_regions_4cts
+        python3 get_functional_peak_beds.py --bed {input[0]} --out {output[0]}
+        python3 get_functional_peak_beds.py --bed {input[0]} --DE_genes {input[1]} --out {output[1]}
+        python3 get_functional_peak_beds.py --bed {input[0]} --DE_genes {input[2]} --out {output[2]}
+        python3 get_functional_peak_beds.py --bed {input[0]} --spcg ../input/SPCG_files/SPCG\ List.xlsx --out {output[3]}
+        """
+
+rule get_functional_peak_regions_fasta_4cts: 
+    input:
+        '../output/get_functional_peak_regions_4cts/down_DE_peaks.bed', 
+        '../output/get_functional_peak_regions_4cts/up_DE_peaks.bed', 
+        '../output/get_functional_peak_regions_4cts/spcg_peaks.bed'
+    output: 
+        '../output/get_functional_peak_regions_4cts/down_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions_4cts/up_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions_4cts/spcg_peaks.fasta'
+    shell:
+        """
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[0]} -nameOnly > {output[0]}
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[1]} -nameOnly > {output[1]}
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[2]} -nameOnly > {output[2]}
+        """
+
+rule dreme_functional_peak_regions_4cts: 
+    input: 
+        '../output/get_functional_peak_regions_4cts/down_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions_4cts/up_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions_4cts/spcg_peaks.fasta'
+    output: 
+        directory("../output/get_functional_peak_regions_4cts/dreme_down_DE_peaks"), 
+        directory("../output/get_functional_peak_regions_4cts/dreme_up_DE_peaks"), 
+        directory("../output/get_functional_peak_regions_4cts/dreme_spcg_peaks")
+    shell: 
+        """
+        dreme -p {input[0]} -o {output[0]} 
+        dreme -p {input[1]} -o {output[1]}
+        dreme -p {input[2]} -o {output[2]} 
+        """
+
+rule tomtom_functional_peak_regions_4cts: 
+    input: 
+        "../output/get_functional_peak_regions_4cts/dreme_down_DE_peaks/dreme.txt", 
+        "../output/get_functional_peak_regions_4cts/dreme_up_DE_peaks/dreme.txt",
+        "../output/get_functional_peak_regions_4cts/dreme_spcg_peaks/dreme.txt"
+    output: 
+        directory("../output/get_functional_peak_regions_4cts/tomtom_down_DE_peaks"),
+        directory("../output/get_functional_peak_regions_4cts/tomtom_up_DE_peaks"),
+        directory("../output/get_functional_peak_regions_4cts/tomtom_spcg_peaks")
+    shell: 
+        """
+        tomtom {input[0]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[0]}
+        tomtom {input[1]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[1]}
+        tomtom {input[2]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[2]}
         """
