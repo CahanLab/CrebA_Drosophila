@@ -101,59 +101,45 @@ rule find_bound_DE_genes:
     input: 
         "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
     output: 
-        directory("../output/find_bound_DE_genes")
+        directory("../output/find_bound_DE_genes"),
+        directory("../output/enrichment_categorized_DE_genes")
     shell: 
         """
         python3 find_bound_DE_genes.py --boundGenes {input[0]} --cts "Salivary Gland" --out {output[0]}
-        # Rscript enrichment_categorized_DE_genes.R
+        Rscript enrichment_categorized_DE_genes.R {output[0]} {output[1]}
         """
 
 rule plot_intersect_bound_genes: 
     input: 
-        "../output/find_bound_DE_genes/down_DE.csv",
-        "../output/find_bound_DE_genes/up_DE.csv",
-        "../output/find_bound_SPCGs/spcg_match_1000.csv",
+        "../output/find_bound_DE_genes",
         "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
     output: 
-        "../output/bound_spcg_DE_venn/bound_down_up_venn.png", 
-        "../output/bound_spcg_DE_venn/bound_SPCGs_down_sc_insitu_venn_sg.png", 
-        "../output/bound_spcg_DE_venn/bound_SPCGs_down_sc_venn_sg.png", 
-        "../output/bound_spcg_DE_venn/bound_SPCGs_down_venn.png", 
-        "../output/bound_spcg_DE_venn/bound_SPCGs_up_venn_sg.png",
-        "../output/bound_spcg_DE_venn/bound_SPCGs_up_venn.png",
-        "../output/bound_spcg_DE_venn/ma_down-sc_down-insitu.png",
-        "../output/bound_spcg_DE_venn/ma_down-sc_down-SPCGs.png",
-        "../output/bound_spcg_DE_venn/ma_up-sc_up-SPCGs.png"
+        directory("../output/bound_spcg_DE_venn")
     shell: 
         """
-        python3 plot_intersect_bound_genes.py
+        python3 plot_intersect_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]}
         """
 
 rule get_all_bound_genes: 
     input: 
-        "../output/find_bound_DE_genes/down_DE.csv",
-        "../output/find_bound_DE_genes/up_DE.csv",
+        "../output/find_bound_DE_genes",
         "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
     output: 
-        "../output/get_all_bound_genes/all_bound_genes_data.csv"
+        directory("../output/get_all_bound_genes/")
     shell: 
         """
-        mkdir -p ../output/get_all_bound_genes/
-        python3 get_all_bound_genes.py 
+        python3 get_all_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]}
         """
 
 rule plot_distance_from_tss: 
     input: 
-        '../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv',
-        "../output/tss_table/tss_table.txt",
-        "../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv",
-        "../output/find_bound_DE_genes/down_DE.csv",
-        "../output/find_bound_DE_genes/up_DE.csv"
+        "../output/find_bound_DE_genes/",
+        '../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv'
     output: 
         directory('../output/plot_location_crebA_binding')
     shell: 
         """
-        Rscript plot_distance_crebA.R
+        Rscript plot_distance_crebA.R {input[0]} {input[1]} {output[0]}
         """
 
 rule get_functional_peak_regions: 
@@ -327,42 +313,50 @@ rule find_bound_DE_genes_4cts:
     input: 
         "../output/match_nearest_gene/oregon_genes_1000.csv"
     output: 
-        directory("../output/find_bound_DE_genes_4cts")
+        directory("../output/find_bound_DE_genes_4cts"),
+        directory("../output/enrichment_categorized_DE_genes_4cts")
     shell: 
         """
         python3 find_bound_DE_genes.py --boundGenes {input[0]} --cts "Salivary Gland" "Amnioserosa" "Plasmatocytes" "Fat Body" --out {output[0]}
-        #Rscript enrichment_categorized_DE_genes_4cts.R
+        Rscript enrichment_categorized_DE_genes.R {output[0]} {output[1]}
         """
 
 rule plot_intersect_bound_genes_4cts: 
     input: 
-        "../output/find_bound_DE_genes_4cts/down_DE.csv",
-        "../output/find_bound_DE_genes_4cts/up_DE.csv",
-        "../output/match_nearest_gene/oregon_intersect_genes_1000.csv"
+        "../output/find_bound_DE_genes_4cts",
+        "../output/match_nearest_gene/oregon_genes_1000.csv"
     output: 
-
+        directory("../output/bound_spcg_DE_venn_4cts")
     shell: 
         """
-        python3 plot_intersect_bound_genes_4cts.py
+        python3 plot_intersect_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]}
+        """
+
+rule get_all_bound_genes_4cts: 
+    input: 
+        "../output/find_bound_DE_genes_4cts",
+        "../output/match_nearest_gene/oregon_genes_1000.csv"
+    output: 
+        directory("../output/get_all_bound_genes_4cts/")
+    shell: 
+        """
+        python3 get_all_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]}
         """
 
 rule plot_distance_from_tss_4cts: 
     input: 
-        '../output/match_nearest_gene/oregon_intersect_genes_1000.csv',
-        "../output/tss_table/tss_table.txt",
-        "../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv",
-        "../output/find_bound_DE_genes/down_DE.csv",
-        "../output/find_bound_DE_genes/up_DE.csv"
+        "../output/find_bound_DE_genes_4cts/",
+        '../output/match_nearest_gene/oregon_genes_1000.csv'
     output: 
-        directory('../output/plot_location_crebA_binding')
+        directory('../output/plot_location_crebA_binding_4cts')
     shell: 
         """
-        Rscript plot_distance_crebA_4cts.R
+        Rscript plot_distance_crebA.R {input[0]} {input[1]} {output[0]}
         """
 
 rule get_functional_peak_regions_4cts: 
     input: 
-        '../output/match_nearest_gene/oregon_intersect_genes_1000.csv', 
+        '../output/match_nearest_gene/oregon_genes_1000.csv', 
         '../output/find_bound_DE_genes_4cts/down_DE.csv', 
         '../output/find_bound_DE_genes_4cts/up_DE.csv', 
         '../input/SPCG_files/SPCG List.xlsx'
@@ -407,9 +401,9 @@ rule dreme_functional_peak_regions_4cts:
         directory("../output/get_functional_peak_regions_4cts/dreme_spcg_peaks")
     shell: 
         """
-        dreme -p {input[0]} -o {output[0]} 
-        dreme -p {input[1]} -o {output[1]}
-        dreme -p {input[2]} -o {output[2]} 
+        dreme -p {input[0]} -o {output[0]}
+        dreme -p {input[1]} -o {output[1]} 
+        dreme -p {input[2]} -o {output[2]}
         """
 
 rule tomtom_functional_peak_regions_4cts: 
@@ -426,4 +420,29 @@ rule tomtom_functional_peak_regions_4cts:
         tomtom {input[0]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[0]}
         tomtom {input[1]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[1]}
         tomtom {input[2]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[2]}
+        """
+
+rule check_core_motif_ACGTG: 
+    input: 
+        '../output/get_functional_peak_regions_4cts/down_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions_4cts/up_DE_peaks.fasta', 
+        '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.fasta', 
+        '../output/get_nonfunctional_peak_regions/300_top_nonfunctional_peaks.fasta',
+        '../output/get_functional_peak_regions/down_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions/up_DE_peaks.fasta'
+    output: 
+        "../output/ACGTG_cores/down_DE_peaks_4cts.csv", 
+        "../output/ACGTG_cores/up_DE_peaks_4cts.csv", 
+        "../output/ACGTG_cores/150_top_nonfunctional_peaks.csv", 
+        "../output/ACGTG_cores/300_top_nonfunctional_peaks.csv",
+        "../output/ACGTG_cores/down_DE_peaks.csv",
+        "../output/ACGTG_cores/up_DE_peaks.csv"
+    shell: 
+        """
+            python3 count_motifs.py --motif ACGTG --fasta {input[0]} --out {output[0]}
+            python3 count_motifs.py --motif ACGTG --fasta {input[1]} --out {output[1]}
+            python3 count_motifs.py --motif ACGTG --fasta {input[2]} --out {output[2]}
+            python3 count_motifs.py --motif ACGTG --fasta {input[3]} --out {output[3]}
+            python3 count_motifs.py --motif ACGTG --fasta {input[4]} --out {output[4]}
+            python3 count_motifs.py --motif ACGTG --fasta {input[5]} --out {output[5]}
         """

@@ -1,10 +1,25 @@
 import pandas as pd
 import numpy as np 
+import argparse
+import os
 
-down_DE_genes_df = pd.read_csv("../output/find_bound_DE_genes/down_DE.csv", index_col=0)
-up_DE_genes_df = pd.read_csv("../output/find_bound_DE_genes/up_DE.csv", index_col=0)
+parser = argparse.ArgumentParser(description='get all the bound genes genes')
+parser.add_argument('--DE_genes', type=str, help = 'folder path for DE genes')
+parser.add_argument('--bound_genes', type=str, help = 'the path for the bound genes')
+parser.add_argument('--out', type=str, help = 'the output path')
+args = parser.parse_args()
 
-crebA_bound_df = pd.read_csv("../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv", index_col = 0)
+DE_genes_path = args.DE_genes
+bound_genes_file = args.bound_genes
+
+output_folder = args.out
+
+os.makedirs(output_folder, exist_ok=True)
+
+down_DE_genes_df = pd.read_csv(os.path.join(DE_genes_path, "down_DE.csv"), index_col=0)
+up_DE_genes_df = pd.read_csv(os.path.join(DE_genes_path, "up_DE.csv"), index_col=0)
+
+crebA_bound_df = pd.read_csv(bound_genes_file, index_col = 0)
 concatenated_array = np.concatenate((np.array(crebA_bound_df['nearest_gene_1'].dropna()), np.array(crebA_bound_df['nearest_gene_2'].dropna())))
 concatenated_array = np.unique(concatenated_array)
 concatenated_array = list(concatenated_array)
@@ -42,4 +57,4 @@ compiled_df['SC_DE_up'] = False
 up_genes = np.array(up_DE_genes_df.loc[np.logical_and(up_DE_genes_df['SC_DE'] == True, up_DE_genes_df['bound'] == True), 'genes'])
 compiled_df.loc[up_genes, 'SC_DE_up'] = True
 
-compiled_df.to_csv("../output/get_all_bound_genes/all_bound_genes_data.csv", index=False)
+compiled_df.to_csv(os.path.join(output_folder, "all_bound_genes_data.csv"), index=False)

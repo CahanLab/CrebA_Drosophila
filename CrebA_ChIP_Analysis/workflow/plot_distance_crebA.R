@@ -4,15 +4,15 @@ library(ggplot2)
 library(cowplot)
 library(readxl)
 
+args = commandArgs(trailingOnly = TRUE)
+
 ##### set up the output folder path ##### 
-output_path = '../output/plot_location_crebA_binding'
+output_path = args[3]
 dir.create((output_path), recursive = TRUE)
 
 ###### read in all the files ######
-crebA_bound = read.csv('../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv', row.names = 1)
+crebA_bound = read.csv(args[2], row.names = 1)
 tss_tab = read.csv("../output/tss_table/tss_table.txt")
-DE_genes = read.csv("../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", row.names = 1)
-rownames(DE_genes) = DE_genes$feature
 rownames(tss_tab) = tss_tab$gene_name
 
 all_bound_data = data.frame()
@@ -46,14 +46,11 @@ all_bound_data = og_all_bound_data %>%
 write.csv(all_bound_data, file = file.path(output_path, 'all_bound_genes_dist.csv'))
 
 ###### plot out the histogram #####
-down_DE = read.csv("../output/find_bound_DE_genes/down_DE.csv", row.names = 1)
+down_DE = read.csv(file.path(args[1], "down_DE.csv"), row.names = 1)
 down_DE = down_DE[down_DE$bound == 'True', ]
 down_DE = down_DE[down_DE$SC_DE == 'True' | down_DE$in_situ_DE == 'True', ]
 rownames(down_DE) = down_DE$genes
 sub_bound_data = all_bound_data[all_bound_data$bound_gene %in% down_DE$genes, ]
-sub_bound_data$logFC = abs(DE_genes[sub_bound_data$bound_gene, 'logFC'])
-sub_bound_data$close_status = '>200 bp'
-sub_bound_data[abs(sub_bound_data$dist_tss) < 200, 'close_status'] = "<200 bp"
 
 p1 = ggplot(sub_bound_data, aes(x = dist_tss)) +
   geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 100, fill = '#66c2a5') + 
@@ -64,20 +61,11 @@ p1 = ggplot(sub_bound_data, aes(x = dist_tss)) +
   cowplot::theme_cowplot()
 ggsave(filename = file.path(output_path, 'activated_genes.png'), plot = p1, width = 5, height = 4)
 
-p1_scatter = ggplot(sub_bound_data, aes(x = abs(dist_tss), y = logFC)) + 
-  geom_point() + 
-  xlab("Absolute distance") + 
-  ylab("logFC") + 
-  ggtitle('CrebA activated and functional genes') + 
-  cowplot::theme_cowplot()
-ggsave(filename = file.path(output_path, 'activated_genes_scatter.png'), plot = p1_scatter, width = 5, height = 4)
-
 ##### plot out the up regulated genes ##### 
-up_DE = read.csv("../output/find_bound_DE_genes/up_DE.csv", row.names = 1)
+up_DE = read.csv(file.path(args[1], "up_DE.csv"), row.names = 1)
 up_DE = up_DE[up_DE$bound == 'True', ]
 up_DE = up_DE[up_DE$SC_DE == 'True', ]
 sub_bound_data = all_bound_data[all_bound_data$bound_gene %in% up_DE$genes, ]
-sub_bound_data$logFC = abs(DE_genes[sub_bound_data$bound_gene, 'logFC'])
 
 p2 = ggplot(sub_bound_data, aes(x = dist_tss)) +
   geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 100, fill = '#fc8d62') + 
@@ -87,14 +75,6 @@ p2 = ggplot(sub_bound_data, aes(x = dist_tss)) +
   ggtitle('CrebA repressed and functional genes') +
   cowplot::theme_cowplot()
 ggsave(filename = file.path(output_path, 'repressed_genes.png'), plot = p2, width = 5, height = 4)
-
-p2_scatter = ggplot(sub_bound_data, aes(x = abs(dist_tss), y = logFC)) + 
-  geom_point() + 
-  xlab("Absolute distance") + 
-  ylab("logFC") + 
-  ggtitle('CrebA repressed and functional genes') + 
-  cowplot::theme_cowplot()
-ggsave(filename = file.path(output_path, 'repressed_genes_scatter.png'), plot = p2_scatter, width = 5, height = 4)
 
 ##### look at SPCGs #####
 SPCG_df = readxl::read_excel("../input/SPCG_files/SPCG List.xlsx")

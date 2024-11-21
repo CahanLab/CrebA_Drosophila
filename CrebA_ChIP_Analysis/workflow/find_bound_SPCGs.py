@@ -31,6 +31,6 @@ for element in concatenated_array:
 
 bound_genes = concatenated_array
 
-spcg_df['fkh_sage_intersect_peaks_bound'] = False
-spcg_df.loc[spcg_df['Drosophila FBgn'].isin(bound_genes), 'fkh_sage_intersect_peaks_bound'] = True
+spcg_df['peaks_bound'] = False
+spcg_df.loc[spcg_df['Drosophila FBgn'].isin(bound_genes), 'peaks_bound'] = True
 spcg_df.to_csv(output_path, index=False)

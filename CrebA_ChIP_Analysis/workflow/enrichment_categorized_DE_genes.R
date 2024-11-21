@@ -5,12 +5,15 @@ library(readxl)
 
 enrichR::setEnrichrSite('FlyEnrichr')
 
-TARGET_dir = file.path("../output/enrichment_categorized_DE_genes")
+args = commandArgs(trailingOnly = TRUE)
+
+input_dir = file.path(args[1])
+TARGET_dir = file.path(args[2])
 dir.create(TARGET_dir, recursive = TRUE)
 
 ##### get the DE genes ###### 
-down_DE_genes = read.csv("../output/find_bound_DE_genes/down_DE.csv", row.names = 1)
-up_DE_genes = read.csv("../output/find_bound_DE_genes/up_DE.csv", row.names = 1)
+down_DE_genes = read.csv(file.path(input_dir, "down_DE.csv"), row.names = 1)
+up_DE_genes = read.csv(file.path(input_dir, "up_DE.csv"), row.names = 1)
 
 # only select the down DE genes that are in sc and bound 
 down_DE_genes = down_DE_genes[down_DE_genes$bound == 'True' & (down_DE_genes$SC_DE == 'True' | down_DE_genes$in_situ_DE == 'True'), ]
