@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np 
 import os 
 import itertools
-
+import venn
 
 # make the color palette 
 color_palette = dict()
@@ -22,8 +22,8 @@ for tmp_key in color_palette.keys():
     DE_genes_dict[tmp_key] = pd.read_csv("../../analysis/results/v19/DE_genes_early_crebA_wt/" + tmp_key + "/mut_DE_genes.csv", index_col = 0)
     DE_genes_dict[tmp_key] = DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['pval'] < 0.05, :].copy()
     DE_genes_dict[tmp_key] = DE_genes_dict[tmp_key].loc[np.abs(DE_genes_dict[tmp_key]['logFC']) > 0.15, :].copy()
-    DE_genes_down_dict[tmp_key] = np.array(DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['logFC'] < 0, 'feature'])
-    DE_genes_up_dict[tmp_key] = np.array(DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['logFC'] > 0, 'feature'])
+    DE_genes_down_dict[tmp_key] = set(DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['logFC'] < 0, 'feature'])
+    DE_genes_up_dict[tmp_key] = set(DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['logFC'] > 0, 'feature'])
 
 
 output_path = "../output/ct_genes_comparison"
@@ -60,3 +60,13 @@ for tmp_combo in ct_combinations:
     plt.savefig(os.path.join(output_path, tmp_combo[0] + "_" + tmp_combo[1] + '_up.png'), dpi=300, bbox_inches='tight')
     plt.clf()
 
+# make the 4 overlaps 
+venn.venn(DE_genes_down_dict)
+plt.title("Down genes overlap across 4 tissues")
+plt.savefig(os.path.join(output_path, 'all_4cts_down.png'), dpi=300, bbox_inches='tight')
+plt.clf()
+
+venn.venn(DE_genes_up_dict)
+plt.title("Up genes overlap across 4 tissues")
+plt.savefig(os.path.join(output_path, 'all_4cts_up.png'), dpi=300, bbox_inches='tight')
+plt.clf()

@@ -166,16 +166,19 @@ rule get_functional_peak_regions_fasta:
     input:
         '../output/get_functional_peak_regions/down_DE_peaks.bed', 
         '../output/get_functional_peak_regions/up_DE_peaks.bed', 
-        '../output/get_functional_peak_regions/spcg_peaks.bed'
+        '../output/get_functional_peak_regions/spcg_peaks.bed', 
+        '../output/get_functional_peak_regions/full_peaks.bed'
     output: 
         '../output/get_functional_peak_regions/down_DE_peaks.fasta', 
         '../output/get_functional_peak_regions/up_DE_peaks.fasta', 
-        '../output/get_functional_peak_regions/spcg_peaks.fasta'
+        '../output/get_functional_peak_regions/spcg_peaks.fasta', 
+        '../output/get_functional_peak_regions/full_peaks.fasta'
     shell:
         """
         bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[0]} -nameOnly > {output[0]}
         bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[1]} -nameOnly > {output[1]}
         bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[2]} -nameOnly > {output[2]}
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[3]} -nameOnly > {output[3]}
         """
  
 rule dreme_functional_peak_regions: 
@@ -378,16 +381,19 @@ rule get_functional_peak_regions_fasta_4cts:
     input:
         '../output/get_functional_peak_regions_4cts/down_DE_peaks.bed', 
         '../output/get_functional_peak_regions_4cts/up_DE_peaks.bed', 
-        '../output/get_functional_peak_regions_4cts/spcg_peaks.bed'
+        '../output/get_functional_peak_regions_4cts/spcg_peaks.bed', 
+        '../output/get_functional_peak_regions_4cts/full_peaks.bed'
     output: 
         '../output/get_functional_peak_regions_4cts/down_DE_peaks.fasta', 
         '../output/get_functional_peak_regions_4cts/up_DE_peaks.fasta', 
-        '../output/get_functional_peak_regions_4cts/spcg_peaks.fasta'
+        '../output/get_functional_peak_regions_4cts/spcg_peaks.fasta', 
+        '../output/get_functional_peak_regions_4cts/full_peaks.fasta'
     shell:
         """
         bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[0]} -nameOnly > {output[0]}
         bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[1]} -nameOnly > {output[1]}
         bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[2]} -nameOnly > {output[2]}
+        bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[3]} -nameOnly > {output[3]}
         """
 
 rule dreme_functional_peak_regions_4cts: 
@@ -429,14 +435,18 @@ rule check_core_motif_ACGTG:
         '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.fasta', 
         '../output/get_nonfunctional_peak_regions/300_top_nonfunctional_peaks.fasta',
         '../output/get_functional_peak_regions/down_DE_peaks.fasta', 
-        '../output/get_functional_peak_regions/up_DE_peaks.fasta'
+        '../output/get_functional_peak_regions/up_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions/full_peaks.fasta', 
+        '../output/get_functional_peak_regions_4cts/full_peaks.fasta'
     output: 
         "../output/ACGTG_cores/down_DE_peaks_4cts.csv", 
         "../output/ACGTG_cores/up_DE_peaks_4cts.csv", 
         "../output/ACGTG_cores/150_top_nonfunctional_peaks.csv", 
         "../output/ACGTG_cores/300_top_nonfunctional_peaks.csv",
         "../output/ACGTG_cores/down_DE_peaks.csv",
-        "../output/ACGTG_cores/up_DE_peaks.csv"
+        "../output/ACGTG_cores/up_DE_peaks.csv", 
+        '../output/ACGTG_cores/sage_fkh_peaks.csv', 
+        '../output/ACGTG_cores/oregon_peaks.csv'
     shell: 
         """
             python3 count_motifs.py --motif ACGTG --fasta {input[0]} --out {output[0]}
@@ -445,4 +455,6 @@ rule check_core_motif_ACGTG:
             python3 count_motifs.py --motif ACGTG --fasta {input[3]} --out {output[3]}
             python3 count_motifs.py --motif ACGTG --fasta {input[4]} --out {output[4]}
             python3 count_motifs.py --motif ACGTG --fasta {input[5]} --out {output[5]}
+            python3 count_motifs.py --motif ACGTG --fasta {input[6]} --out {output[6]}
+            python3 count_motifs.py --motif ACGTG --fasta {input[7]} --out {output[7]}
         """
