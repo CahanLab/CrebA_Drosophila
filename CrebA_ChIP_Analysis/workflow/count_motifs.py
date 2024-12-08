@@ -56,13 +56,11 @@ comp_motif = get_complement(motif)
 comp_rev_motif = get_complement(rev_motif)
 
 fasta_dict = parse_fasta_to_dict(fasta_file_path)
-output_df = pd.DataFrame(columns = ['peaks', 'motif', 'rev_motif', 'comp_motif', 'comp_rev_motif'])
+output_df = pd.DataFrame(columns = ['peaks', 'motif', 'comp_rev_motif'])
 
 for tmp_peak in fasta_dict.keys():
     motif_loc = get_motif_loc(motif, fasta_dict[tmp_peak])
-    rev_motif_loc = get_motif_loc(rev_motif, fasta_dict[tmp_peak])
-    comp_motif_loc = get_motif_loc(comp_motif, fasta_dict[tmp_peak])
     comp_rev_motif_loc = get_motif_loc(comp_rev_motif, fasta_dict[tmp_peak])
-    output_df.loc[len(output_df)] = [tmp_peak, motif_loc, rev_motif_loc, comp_motif_loc, comp_rev_motif_loc]
+    output_df.loc[len(output_df)] = [tmp_peak, motif_loc, comp_rev_motif_loc]
 
 output_df.to_csv(output_path, index=False)

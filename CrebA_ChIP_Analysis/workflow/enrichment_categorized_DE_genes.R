@@ -110,11 +110,11 @@ p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = t
   theme(
     panel.spacing = unit(x = 1, units = "lines"),
     strip.background = element_blank(), 
-    text = element_text(size = 30), 
+    text = element_text(size = 35), 
     legend.position="none", 
     plot.title.position = "plot"
   ) + 
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=0, vjust = 1, hjust=1)) +
   ggtitle('Geneset enrichment of CrebA bound and functional genes (no SPCGs)')  
 
-ggsave(filename = file.path(TARGET_dir, 'enrichment_no_spcg_analysis.png'), plot = p, height = 10, width = 18)
+ggsave(filename = file.path(TARGET_dir, 'enrichment_no_spcg_analysis.png'), plot = p, height = 10, width = 19)
