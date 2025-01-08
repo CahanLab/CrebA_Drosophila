@@ -72,6 +72,9 @@ source("R/DE_genes_early_crebA_wt.R")
 # plot some of the GSEA results 
 source("R/plot_gsea_crebA_wt_early.R")
 
+# project same tissues onto UMAPs 
+source("R/crebA_wt_early_ct_subset.R")
+
 # we will just use CrebA rep 3 as the only CrebA sample. No replicate. 
 source("R/manual_label_crebA.R")
 
