@@ -193,7 +193,7 @@ sub_crebA_exp = spcg_dot_df[spcg_dot_df$features.plot == 'CrebA', ]
 sub_crebA_exp = sub_crebA_exp[order(sub_crebA_exp$avg.exp.scaled), ]
 
 spcg_dot_df$id = factor(spcg_dot_df$id, levels = sub_crebA_exp$id)
-spcg_dot_df$category = factor(spcg_dot_df$category, levels = unique(spcg_dot_df$category))
+spcg_dot_df$category = factor(spcg_dot_df$category, levels = c('CrebA', unique(spcg_dot_df$category)[unique(spcg_dot_df$category) != 'CrebA']))
 spcg_dot_df = spcg_dot_df[spcg_dot_df$category != 'Prolyl hydroxylation', ]
 
 write.csv(spcg_dot_df, file = file.path(TARGET_dir, subfolder_path, 'spcg_scale_exp.csv'))

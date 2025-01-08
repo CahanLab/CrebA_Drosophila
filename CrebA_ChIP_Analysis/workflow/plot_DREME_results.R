@@ -74,3 +74,28 @@ for(tmp_name in names(curated_logo_list)) {
   ggsave(filename = file.path(output_path, paste0(tmp_name, "_", curated_logo_list[[tmp_name]]$seq_id, ".png")), plot = p, width = 4, height = 2)
 }
 
+##### make logo sequence down 4cts #####
+input_path = file.path("../output/get_functional_peak_regions_majority_4cts/dreme_down_DE_peaks/")
+output_path = file.path(input_path, 'logo_seq')
+
+dreme_xml <- xml2::read_xml(file.path(input_path, "dreme.xml"))  # Replace with your XML file path
+curated_logo_list = curate_logos(dreme_xml)
+for(tmp_name in names(curated_logo_list)) { 
+  p = ggseqlogo(curated_logo_list[[tmp_name]]$prop_mat) + 
+    ggtitle(paste0(curated_logo_list[[tmp_name]]$seq_id, " motif eval: ", curated_logo_list[[tmp_name]]$eval)) + 
+    cowplot::theme_cowplot()
+  ggsave(filename = file.path(output_path, paste0(tmp_name, "_", curated_logo_list[[tmp_name]]$seq_id, ".png")), plot = p, width = 4, height = 2)
+}
+
+##### make logo sequence up 4cts #####
+input_path = file.path("../output/get_functional_peak_regions_majority_4cts/dreme_up_DE_peaks//")
+output_path = file.path(input_path, 'logo_seq')
+
+dreme_xml <- xml2::read_xml(file.path(input_path, "dreme.xml"))  # Replace with your XML file path
+curated_logo_list = curate_logos(dreme_xml)
+for(tmp_name in names(curated_logo_list)) { 
+  p = ggseqlogo(curated_logo_list[[tmp_name]]$prop_mat) + 
+    ggtitle(paste0(curated_logo_list[[tmp_name]]$seq_id, " motif eval: ", curated_logo_list[[tmp_name]]$eval)) + 
+    cowplot::theme_cowplot()
+  ggsave(filename = file.path(output_path, paste0(tmp_name, "_", curated_logo_list[[tmp_name]]$seq_id, ".png")), plot = p, width = 4, height = 2)
+}
