@@ -61,10 +61,12 @@ for(tmp_ct in ct_list) {
   plot_df = rbind(plot_df, mut_DE_genes)
 }
 
-sub_exp_order = plot_df[plot_df$feature == 'CrebA', ]
-sub_exp_order = sub_exp_order[order(sub_exp_order$logFC, decreasing = TRUE), ]
+exp_order = read.csv(file.path(file.path("results", ANALYSIS_VERSION, "Figures/plot_spcg_wt", 'wt_early', 'spcg_scale_exp.csv')), row.names = 1)
+sub_exp_order = exp_order[exp_order$features.plot == 'CrebA', ]
+sub_exp_order = sub_exp_order[sub_exp_order$id %in% plot_df$celltype, ]
+sub_exp_order = sub_exp_order[order(sub_exp_order$avg.exp.scaled, decreasing = FALSE), ]
 
-plot_df$celltype = factor(plot_df$celltype, levels = sub_exp_order$celltype)
+plot_df$celltype = factor(plot_df$celltype, levels = sub_exp_order$id)
 plot_df$spcg_cat = factor(plot_df$spcg_cat, levels = c("CrebA", unique(spcg_tab$`SPCG General Functional Categories`)[unique(spcg_tab$`SPCG General Functional Categories`) != 'CrebA']))
 plot_df = plot_df[plot_df$spcg_cat != 'Prolyl hydroxylation', ]
 

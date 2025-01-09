@@ -63,14 +63,8 @@ source("R/early_crebA_gsea.R")
 # find the DE genes betweent different cell types in early wildtype 
 source("R/early_wt_gsea.R")
 
-# plot out the DE genes between different cell types in CrebA 
-source("R/plot_early_crebA_gsea.R")
-
 # find DE genes between the same cell types 
 source("R/DE_genes_early_crebA_wt.R")
-
-# plot some of the GSEA results 
-source("R/plot_gsea_crebA_wt_early.R")
 
 # project same tissues onto UMAPs 
 source("R/crebA_wt_early_ct_subset.R")
@@ -80,9 +74,6 @@ source("R/manual_label_crebA.R")
 
 # find DE genes between the same cell types 
 source("R/DE_genes_crebA_wt.R")
-
-# plot some of the GSEA results 
-source("R/plot_gsea_crebA_wt.R")
 
 ##### make the plotting scripts ######
 
@@ -110,7 +101,18 @@ source("R/check_genes_UMAP.R")
 # look at the secretome in wildtype data 
 source("R/plot_secretome_wt.R")
 
+# plot some of the GSEA results 
+source("R/plot_gsea_crebA_wt_early.R")
+
+# plot some of the GSEA results 
+source("R/plot_gsea_crebA_wt.R")
+
+# plot out apodemes and optic lobe genes 
+source("R/plot_ap_ol_genes.R")
 ###### unused scripts ######
 
 # make the plots of the common cell types 
 source("R/plot_crebA_wt_early_late.R")
+
+# plot out the DE genes between different cell types in CrebA 
+source("R/plot_early_crebA_gsea.R")
