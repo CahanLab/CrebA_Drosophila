@@ -184,7 +184,70 @@ p <- ggplot(data = sub_mut_df, aes(y = reorder(pathway, logpval), x = logpval, f
   ggtitle('Geneset enrichment in stage 10-12 mutant embryos')  
 ggsave(filename = file.path(TARGET_dir, 'mutant_selected_ct2.png'), width = 11, height = 10)
 
-##### make the wildtype plot - trachea, glia, hindugt#####
+##### make the wildtype plot - Salivary Gland', 'Plasmatocytes', 'Amnioserosa', 'Fat Body', trachea, glia, hindugt#####
+ct_interest = c('Salivary Gland', 'Plasmatocytes', 'Amnioserosa', 'Fat Body', 'Trachea', 'Glia', 'Hindgut')
+color_palette = readRDS(file.path('results', ANALYSIS_VERSION, 'ct_color_palettes/ct_color_palette.rds'))
+sub_wt_df = wt_df[wt_df$celltype %in% ct_interest, ]
+sub_wt_df$celltype = factor(x = sub_wt_df$celltype, levels = ct_interest)
+sub_wt_df$pathway = stringr::str_split_fixed(sub_wt_df$pathway, pattern = " \\(", n = 2)[, 1]
+
+p <- ggplot(data = sub_wt_df, aes(y = reorder(pathway, logpval), x = logpval, fill = celltype)) +
+  geom_bar(stat="identity") +
+  labs(
+    x = '-log10 adjusted p-value',
+    y = ''
+  ) + 
+  scale_fill_manual(values =color_palette) + 
+  theme_classic()  + 
+  facet_grid(
+    rows = vars(celltype),
+    scales = "free_y",
+    space = "free_y",
+    switch = "x"
+  ) + 
+  theme(
+    panel.spacing = unit(x = 1, units = "lines"),
+    strip.background = element_blank(), 
+    text = element_text(size = 25), 
+    legend.position="none", 
+    plot.title.position = "plot"
+  ) + 
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=0, vjust = 1, hjust=1)) +
+  ggtitle('Geneset enrichment in stage 10-12 wildtype embryos')  
+ggsave(filename = file.path(TARGET_dir, 'wildtype_selected_ct2_long.png'), width = 11, height = 19)
+
+sub_mut_df = mut_df[mut_df$celltype %in% ct_interest, ]
+sub_mut_df$celltype = factor(x = sub_mut_df$celltype, levels = ct_interest)
+
+sub_mut_df$pathway = stringr::str_split_fixed(sub_mut_df$pathway, pattern = " \\(", n = 2)[, 1]
+
+p <- ggplot(data = sub_mut_df, aes(y = reorder(pathway, logpval), x = logpval, fill = celltype)) +
+  geom_bar(stat="identity") +
+  labs(
+    x = '-log10 adjusted p-value',
+    y = ''
+  ) + 
+  scale_fill_manual(values =color_palette) + 
+  theme_classic()  + 
+  facet_grid(
+    rows = vars(celltype),
+    scales = "free_y",
+    space = "free_y",
+    switch = "x"
+  ) + 
+  theme(
+    panel.spacing = unit(x = 1, units = "lines"),
+    strip.background = element_blank(), 
+    text = element_text(size = 25), 
+    legend.position="none", 
+    plot.title.position = "plot"
+  ) + 
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=0, vjust = 1, hjust=1)) +
+  ggtitle('Geneset enrichment in stage 10-12 mutant embryos')  
+ggsave(filename = file.path(TARGET_dir, 'mutant_selected_ct2_long.png'), width = 11, height = 19)
+
+
+##### make the wildtype plot - other cts #####
 ct_interest = c('somatic Muscle', 'CNS', 'Gut Endoderm', 'Circular Visceral Mesoderm', 'Germ Cells')
 color_palette = readRDS(file.path('results', ANALYSIS_VERSION, 'ct_color_palettes/ct_color_palette.rds'))
 sub_wt_df = wt_df[wt_df$celltype %in% ct_interest, ]

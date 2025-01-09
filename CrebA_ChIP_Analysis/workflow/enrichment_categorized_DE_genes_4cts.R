@@ -35,7 +35,7 @@ up_enriched_df$type = 'Repression'
 
 down_enriched_df = down_enriched_df[order(down_enriched_df$Adjusted.P.value), ]
 up_enriched_df = up_enriched_df[order(up_enriched_df$Adjusted.P.value), ]
-big_df = rbind(down_enriched_df[1:5, ], up_enriched_df[1:5, ])
+big_df = rbind(down_enriched_df[1:4, ], up_enriched_df[1:4, ])
 
 p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = type)) +
   geom_bar(stat="identity") +
