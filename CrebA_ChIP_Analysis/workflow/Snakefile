@@ -117,7 +117,7 @@ rule plot_intersect_bound_genes:
         directory("../output/bound_spcg_DE_venn")
     shell: 
         """
-        python3 plot_intersect_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]}
+        python3 plot_intersect_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]} --sc_type "salivary gland"
         """
 
 rule get_all_bound_genes: 
@@ -332,7 +332,7 @@ rule plot_intersect_bound_genes_4cts:
         directory("../output/bound_spcg_DE_venn_4cts")
     shell: 
         """
-        python3 plot_intersect_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]}
+        python3 plot_intersect_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]} --sc_type "4 cts"
         """
 
 rule get_all_bound_genes_4cts: 
@@ -448,7 +448,7 @@ rule plot_intersect_bound_genes_majority_4cts:
         directory("../output/bound_spcg_DE_venn_majority_4cts")
     shell: 
         """
-        python3 plot_intersect_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]}
+        python3 plot_intersect_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]} --sc_type "majority 4cts"
         """
 
 rule get_all_bound_genes_majority_4cts: 
@@ -544,7 +544,6 @@ rule tomtom_functional_peak_regions_majority_4cts:
         tomtom {input[2]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[2]}
         """
 
-
 rule check_core_motif_ACGTG: 
     input: 
         '../output/get_functional_peak_regions_4cts/down_DE_peaks.fasta', 
@@ -575,3 +574,35 @@ rule check_core_motif_ACGTG:
             python3 count_motifs.py --motif ACGTG --fasta {input[6]} --out {output[6]}
             python3 count_motifs.py --motif ACGTG --fasta {input[7]} --out {output[7]}
         """
+
+rule check_core_motif_ACGTC: 
+    input: 
+        '../output/get_functional_peak_regions_4cts/down_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions_4cts/up_DE_peaks.fasta', 
+        '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.fasta', 
+        '../output/get_nonfunctional_peak_regions/300_top_nonfunctional_peaks.fasta',
+        '../output/get_functional_peak_regions/down_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions/up_DE_peaks.fasta', 
+        '../output/get_functional_peak_regions/full_peaks.fasta', 
+        '../output/get_functional_peak_regions_4cts/full_peaks.fasta'
+    output: 
+        "../output/ACGTC_cores/down_DE_peaks_4cts.csv", 
+        "../output/ACGTC_cores/up_DE_peaks_4cts.csv", 
+        "../output/ACGTC_cores/150_top_nonfunctional_peaks.csv", 
+        "../output/ACGTC_cores/300_top_nonfunctional_peaks.csv",
+        "../output/ACGTC_cores/down_DE_peaks.csv",
+        "../output/ACGTC_cores/up_DE_peaks.csv", 
+        '../output/ACGTC_cores/sage_fkh_peaks.csv', 
+        '../output/ACGTC_cores/oregon_peaks.csv'
+    shell: 
+        """
+            python3 count_motifs.py --motif ACGTC --fasta {input[0]} --out {output[0]}
+            python3 count_motifs.py --motif ACGTC --fasta {input[1]} --out {output[1]}
+            python3 count_motifs.py --motif ACGTC --fasta {input[2]} --out {output[2]}
+            python3 count_motifs.py --motif ACGTC --fasta {input[3]} --out {output[3]}
+            python3 count_motifs.py --motif ACGTC --fasta {input[4]} --out {output[4]}
+            python3 count_motifs.py --motif ACGTC --fasta {input[5]} --out {output[5]}
+            python3 count_motifs.py --motif ACGTC --fasta {input[6]} --out {output[6]}
+            python3 count_motifs.py --motif ACGTC --fasta {input[7]} --out {output[7]}
+        """
+        

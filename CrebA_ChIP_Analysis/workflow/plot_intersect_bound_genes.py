@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from matplotlib_venn import venn3, venn3_circles
+from matplotlib_venn import venn3, venn2
 import pandas as pd 
 import numpy as np 
 import os 
@@ -9,11 +9,33 @@ parser = argparse.ArgumentParser(description='plot various venn diagrams')
 parser.add_argument('--DE_genes', type=str, help = 'the output files with the bound DE genes')
 parser.add_argument('--bound_genes', type=str, help = 'the path for the bed files')
 parser.add_argument('--out', type=str, help = 'the output path')
+parser.add_argument('--sc_type', type=str, help = 'the type of venn diagram to plot for the single cell')
 args = parser.parse_args()
 
 DE_genes_path = args.DE_genes
 bound_genes_path = args.bound_genes
 output_path = args.out
+sc_type = args.sc_type
+
+color_palettes = {}
+# make an if state to set the color palette 
+if sc_type == 'salivary gland':
+    color_palettes['repression'] = '#E48482'
+    color_palettes['activation'] = '#6BAF92'
+    color_palettes['bound'] = '#A4A9D1'
+    color_palettes['SPCGs'] = '#D9B76E'
+else: 
+    color_palettes['repression'] = '#84E4D9'
+    color_palettes['activation'] = '#AF6B7F'
+    color_palettes['bound'] = '#A9D1A4'
+    color_palettes['SPCGs'] = '#7656D9'
+
+if sc_type == 'salivary gland':
+    bracket_name = '(SG)'
+elif sc_type == 'majority 4cts':
+    bracket_name = '(≥3/4 cts)'
+elif sc_type == '4 cts':
+    bracket_name = '(4 cts)'
 
 # create the directory if needed 
 if os.path.isdir(output_path) == False:
@@ -68,45 +90,46 @@ bound_genes = np.unique(concatenated_array)
 ###### there are to make plots #######
 # ma, sc, insitus
 ax = venn3([set(MA_down_genes), set(sc_down_genes), set(insitu_genes)], 
-      ('MA down genes', 'SC down genes', 'in-situ'), 
+      ('Microarray', 'Single-cell ' + bracket_name, 'in-situ'), 
       set_colors = ['#6B717E', '#66c2a5', '#8DA0CB'], alpha = 0.8)  
-plt.title("MA down, SC down, SPCG") 
+
+# Set font sizes for labels
+for label in ax.set_labels:
+    label.set_fontsize(16)  # Set size for set labels (A, B)
+
+for label in ax.subset_labels:
+    if label:  # Check if the label exists
+        label.set_fontsize(14)  # Set size for subset labels
 plt.savefig(os.path.join(output_path, 'ma_down-sc_down-insitu.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 # comment -- seems like in-situ and sc down genes seem to be the best for just SG 
 
-venn3([set(bound_genes), set(spcgs_genes), set(down_genes)], 
-      ('Bound genes', 'SPCGs', 'Activated genes'), 
-      set_colors = ['#e78ac3', '#ffd92f', '#66c2a5'], alpha = 0.8)  
-plt.title("CrebA bound and activated genes") 
-plt.savefig(os.path.join(output_path, 'bound_SPCGs_down_venn.png'), dpi=300, bbox_inches='tight')
-plt.clf()
 
 venn3([set(bound_genes), set(spcgs_genes), set(sc_down_genes)], 
       ('Bound genes', 'SPCGs', 'Activated genes'), 
-      set_colors = ['#e78ac3', '#ffd92f', '#66c2a5'], alpha = 0.8)  
-plt.title("CrebA bound and activated genes in salivary gland") 
+      set_colors = [color_palettes['bound'], color_palettes['SPCGs'], color_palettes['activation']], alpha = 0.8)  
+plt.title("CrebA bound and activated genes in " + sc_type) 
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_down_sc_venn.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
 venn3([set(bound_genes), set(spcgs_genes), set(np.concatenate((sc_down_genes, insitu_genes)))], 
       ('Bound genes', 'SPCGs', 'Activated genes'), 
-      set_colors = ['#e78ac3', '#ffd92f', '#66c2a5'], alpha = 0.8)  
-plt.title("CrebA bound and activated genes in salivary gland") 
+      set_colors = [color_palettes['bound'], color_palettes['SPCGs'], color_palettes['activation']], alpha = 0.8)  
+plt.title("CrebA bound and activated genes in " + sc_type) 
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_down_sc_insitu_venn.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
-venn3([set(bound_genes), set(spcgs_genes), set(up_genes)], 
-      ('Bound genes', 'SPCGs', 'Repressed Genes'), 
-      set_colors = ['#e78ac3', '#ffd92f', '#fc8d62'], alpha = 0.8)  
+venn2([set(bound_genes),  set(up_genes)], 
+      ('Bound genes', 'Repressed Genes'), 
+      set_colors = [color_palettes['bound'], color_palettes['repression']], alpha = 0.8)  
 plt.title("CrebA bound and repressed genes") 
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_up_venn.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
-venn3([set(bound_genes), set(spcgs_genes), set(sc_up_genes)], 
-      ('Bound genes', 'SPCGs', 'Repressed Genes'), 
-      set_colors = ['#e78ac3', '#ffd92f', '#fc8d62'], alpha = 0.8)  
-plt.title("CrebA bound and repressed genes in salivary gland") 
+venn2([set(bound_genes), set(sc_up_genes)], 
+      ('Bound genes', 'Repressed Genes'), 
+      set_colors = [color_palettes['bound'], color_palettes['repression']], alpha = 0.8)  
+plt.title("CrebA bound and repressed genes in " + sc_type) 
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_up_sc_venn.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
@@ -116,20 +139,28 @@ plt.savefig(os.path.join(output_path, 'bound_down_up_venn.png'), dpi=300, bbox_i
 plt.clf()
 
 # ma, sc, spcg
-fig, ax = plt.subplots(figsize=(8, 8))  # width and height in inches
 ax = venn3([set(MA_down_genes), set(sc_down_genes), set(spcgs_genes)], 
-      ('MA down genes', 'SC down genes', 'SPCGs'), 
+      ('Microarray', 'Single-cell ' + bracket_name, 'SPCGs'), 
       set_colors = ['#6B717E', '#66c2a5', '#ffd92f'], alpha = 0.8)  
-plt.title("MA down, SC down, SPCG") 
+for label in ax.set_labels:
+    label.set_fontsize(16)  # Set size for set labels (A, B)
+
+for label in ax.subset_labels:
+    if label:  # Check if the label exists
+        label.set_fontsize(14)  # Set size for subset labels
 plt.savefig(os.path.join(output_path, 'ma_down-sc_down-SPCGs.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
 # ma up, sc up spcg
-fig, ax = plt.subplots(figsize=(8, 8))  # width and height in inches
 ax = venn3([set(MA_up_genes), set(sc_up_genes), set(spcgs_genes)], 
-      ('MA up genes', 'SC up genes', 'SPCGs'), 
+      ('Microarray', 'Single-cell ' + bracket_name, 'SPCGs'), 
       set_colors = ['#B8D1A2', '#fc8d62', '#ffd92f'], alpha = 0.8)  
-plt.title("MA up, SC up, SPCG") 
+for label in ax.set_labels:
+    label.set_fontsize(16)  # Set size for set labels (A, B)
+
+for label in ax.subset_labels:
+    if label:  # Check if the label exists
+        label.set_fontsize(14)  # Set size for subset labels
 plt.savefig(os.path.join(output_path, 'ma_up-sc_up-SPCGs.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 

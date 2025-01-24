@@ -15,6 +15,16 @@ dir.create(TARGET_dir, recursive = TRUE)
 down_DE_genes = read.csv(file.path(input_dir, "down_DE.csv"), row.names = 1)
 up_DE_genes = read.csv(file.path(input_dir, "up_DE.csv"), row.names = 1)
 
+if (grepl('4cts', input_dir)[1] == TRUE) {
+  color_palette = c('#84E4D9', '#AF6B7F')
+  names(color_palette) = c('repression', 'activation')
+  num_entry = 4
+} else { 
+  color_palette = c('#E48482', '#6BAF92')
+  names(color_palette) = c('repression', 'activation')
+  num_entry = 5
+}
+
 # only select the down DE genes that are in sc and bound 
 down_DE_genes = down_DE_genes[down_DE_genes$bound == 'True' & (down_DE_genes$SC_DE == 'True' | down_DE_genes$in_situ_DE == 'True'), ]
 up_DE_genes = up_DE_genes[up_DE_genes$bound == 'True' & up_DE_genes$SC_DE == 'True', ]
@@ -38,7 +48,7 @@ up_enriched_df$type = 'Repression'
 
 down_enriched_df = down_enriched_df[order(down_enriched_df$Adjusted.P.value), ]
 up_enriched_df = up_enriched_df[order(up_enriched_df$Adjusted.P.value), ]
-big_df = rbind(down_enriched_df[1:5, ], up_enriched_df[1:5, ])
+big_df = rbind(down_enriched_df[1:num_entry, ], up_enriched_df[1:num_entry, ])
 
 p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = type)) +
   geom_bar(stat="identity") +
@@ -46,7 +56,7 @@ p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = t
     x = '-log10 adjusted p-value',
     y = ''
   ) + 
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_manual(values = c("Repression" = color_palette[['repression']], "Activation" = color_palette[['activation']])) +
   theme_classic()  + 
   facet_grid(
     rows = vars(type),
@@ -91,7 +101,7 @@ up_enriched_df$type = 'Repression'
 
 down_enriched_df = down_enriched_df[order(down_enriched_df$Adjusted.P.value), ]
 up_enriched_df = up_enriched_df[order(up_enriched_df$Adjusted.P.value), ]
-big_df = rbind(down_enriched_df[1:5, ], up_enriched_df[1:5, ])
+big_df = rbind(down_enriched_df[1:num_entry, ], up_enriched_df[1:num_entry, ])
 
 p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = type)) +
   geom_bar(stat="identity") +
@@ -99,7 +109,7 @@ p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = t
     x = '-log10 adjusted p-value',
     y = ''
   ) + 
-  scale_fill_brewer(palette = 'Set2') + 
+  scale_fill_manual(values = c("Repression" = color_palette[['repression']], "Activation" = color_palette[['activation']])) +
   theme_classic()  + 
   facet_grid(
     rows = vars(type),

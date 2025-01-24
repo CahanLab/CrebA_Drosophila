@@ -75,6 +75,9 @@ source("R/manual_label_crebA.R")
 # find DE genes between the same cell types 
 source("R/DE_genes_crebA_wt.R")
 
+# compare mutant and wildtype gene expression 
+source("R/compare_gene_distribution.r")
+
 ##### make the plotting scripts ######
 
 # make the color palette 

@@ -18,7 +18,7 @@ for(tmp_marker in apodemes_genes) {
 }
 
 # optic lobe 
-ol_genes = c('E(Spl)m5-HLH', 'SoxN', 'Obp99a')
+ol_genes = c('E(spl)m5-HLH', 'SoxN', 'Obp99a')
 fun_color_range <- colorRampPalette(c("#f5e5e4", "#fc1303"))
 my_colors <- fun_color_range(20)    
 
@@ -27,3 +27,5 @@ for(tmp_marker in ol_genes) {
     scale_colour_gradientn(colors = my_colors)
   ggsave(filename = file.path(TARGET_dir, paste0(tmp_marker, "_wt.png")), width = 4, height= 4)
 }
+
+rownames(wt_object)[grep('m5-HLH', rownames(wt_object))]
