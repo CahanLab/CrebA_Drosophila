@@ -48,6 +48,17 @@ plot_df[down_genes$genes, 'type'] = 'Activated'
 
 plot_df = plot_df[plot_df$mut_norm > 0 | plot_df$wt_norm > 0, ]
 
+fit <- lm(mut_norm ~ wt_norm, data = plot_df)
+
+# Extract slope and intercept
+slope <- coef(fit)[2]
+intercept <- coef(fit)[1]
+r_squared <- summary(fit)$r.squared
+
+# Create the regression equation as a label
+equation <- paste0("y = ", round(slope, 2), "x + ", round(intercept, 2), 
+                   ", R² = ", round(r_squared, 3))
+
 p = ggplot(plot_df, aes(color = type)) +
   geom_point(data = subset(plot_df, type == "None"), aes(x = wt_norm, y = mut_norm), 
              color = "#ff7f0e", size = 3) +
@@ -55,14 +66,18 @@ p = ggplot(plot_df, aes(color = type)) +
              color = "#1f77b4", size = 4) +
   geom_point(data = subset(plot_df, type == "Repressed"), aes(x = wt_norm, y = mut_norm), 
              color = "#2ca02c", size = 4) +
+  geom_smooth(data = plot_df, aes(x = wt_norm, y = mut_norm), method = "lm", color = "black", linetype = "dotted", se = FALSE) +
   labs(
     title = "wt vs mut salivary gland norm experssion",
     x = "wt salivary gland norm expression",
     y = "mut salivary gland norm expression"
   ) +
+  annotate("text", x = 0.5, 
+           y = 4, 
+           label = equation, 
+           color = "black", size = 5, hjust = 0) +
   scale_color_manual(values = c("Activated" = "#1f77b4", "None" = "#ff7f0e", "Repressed" = "#2ca02c"), name = 'Legend') +
-  geom_abline(slope = 1, intercept = 0, color = "blue", linetype = "dashed", size = 1) + # Blue diagonal line
-cowplot::theme_cowplot()
+  cowplot::theme_cowplot()
 
 lm_exp = lm(mut_norm ~ wt_norm, data = plot_df) #Create a linear regression with two variables
 summary(lm_exp) #Review the results
@@ -71,7 +86,7 @@ ggsave(filename = file.path(TARGET_dir, 'wt_mut_norm_exp.png'), plot = p, width 
 
 ##### look at plasmatocyte #####
 
-for(celltype in c('Plasmatocytes', 'Fat Body', 'Amnioserosa')) {
+for(celltype in c('Salivary Gland', 'Plasmatocytes', 'Fat Body', 'Amnioserosa')) {
   sub_wt_obj = subset(wt_object, subset = manual_celltypes == celltype) 
   sub_wt_obj@meta.data$experimental_condition = 'Wt'
   
@@ -115,6 +130,17 @@ for(celltype in c('Plasmatocytes', 'Fat Body', 'Amnioserosa')) {
   
   plot_df = plot_df[plot_df$mut_norm > 0 | plot_df$wt_norm > 0, ]
   
+  fit <- lm(mut_norm ~ wt_norm, data = plot_df)
+  
+  # Extract slope and intercept
+  slope <- coef(fit)[2]
+  intercept <- coef(fit)[1]
+  r_squared <- summary(fit)$r.squared
+  
+  # Create the regression equation as a label
+  equation <- paste0("y = ", round(slope, 2), "x + ", round(intercept, 2), 
+                     ", R² = ", round(r_squared, 3))
+  
   p = ggplot(plot_df, aes(color = type)) +
     geom_point(data = subset(plot_df, type == "None"), aes(x = wt_norm, y = mut_norm), 
                color = "#ff7f0e", size = 3) +
@@ -122,13 +148,17 @@ for(celltype in c('Plasmatocytes', 'Fat Body', 'Amnioserosa')) {
                color = "#1f77b4", size = 4) +
     geom_point(data = subset(plot_df, type == "Repressed"), aes(x = wt_norm, y = mut_norm), 
                color = "#2ca02c", size = 4) +
+    geom_smooth(data = plot_df, aes(x = wt_norm, y = mut_norm), method = "lm", color = "black", linetype = "dotted", se = FALSE) +
     labs(
       title = paste0("wt vs mut ", celltype, " norm experssion"),
       x = paste0("wt ", celltype, " norm expression"),
       y = paste0("mut ", celltype, " norm expression")
     ) +
+    annotate("text", x = 0.5, 
+             y = 4, 
+             label = equation, 
+             color = "black", size = 5, hjust = 0) +
     scale_color_manual(values = c("Activated" = "#1f77b4", "None" = "#ff7f0e", "Repressed" = "#2ca02c"), name = 'Legend') +
-    geom_abline(slope = 1, intercept = 0, color = "blue", linetype = "dashed", size = 1) + # Blue diagonal line
     cowplot::theme_cowplot()
   
   lm_exp = lm(mut_norm ~ wt_norm, data = plot_df) #Create a linear regression with two variables

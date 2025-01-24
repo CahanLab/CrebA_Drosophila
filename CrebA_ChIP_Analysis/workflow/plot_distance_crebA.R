@@ -10,6 +10,14 @@ args = commandArgs(trailingOnly = TRUE)
 output_path = args[3]
 dir.create((output_path), recursive = TRUE)
 
+if (grepl('4cts', args[1])[1] == TRUE) {
+  color_palette = c('#84E4D9', '#AF6B7F')
+  names(color_palette) = c('repression', 'activation')
+} else { 
+  color_palette = c('#E48482', '#6BAF92')
+  names(color_palette) = c('repression', 'activation')
+}
+
 ###### read in all the files ######
 crebA_bound = read.csv(args[2], row.names = 1)
 tss_tab = read.csv("../output/tss_table/tss_table.txt")
@@ -53,7 +61,7 @@ rownames(down_DE) = down_DE$genes
 sub_bound_data = all_bound_data[all_bound_data$bound_gene %in% down_DE$genes, ]
 
 p1 = ggplot(sub_bound_data, aes(x = dist_tss)) +
-  geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 100, fill = '#66c2a5') + 
+  geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 100, fill = color_palette[['activation']]) + 
   xlim(c(-1500, 1500)) + 
   ylab("Percentage") +
   xlab("Distance away from TSS") +
@@ -68,7 +76,7 @@ up_DE = up_DE[up_DE$SC_DE == 'True', ]
 sub_bound_data = all_bound_data[all_bound_data$bound_gene %in% up_DE$genes, ]
 
 p2 = ggplot(sub_bound_data, aes(x = dist_tss)) +
-  geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 100, fill = '#fc8d62') + 
+  geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 100, fill = color_palette[['repression']]) + 
   xlim(c(-1500, 1500)) + 
   ylab("Percentage") +
   xlab("Distance away from TSS") +
