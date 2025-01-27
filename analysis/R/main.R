@@ -110,8 +110,3 @@ source("R/DE_genes_embryo_level.R")
 # this is to look at the cell cell communication 
 source("R/FlyPhoneDB_wt.R")
 
-# make the plots of the common cell types 
-source("R/plot_crebA_wt_early_late.R")
-
-# plot out the DE genes between different cell types in CrebA 
-source("R/plot_early_crebA_gsea.R")
