@@ -605,4 +605,11 @@ rule check_core_motif_ACGTC:
             python3 count_motifs.py --motif ACGTC --fasta {input[6]} --out {output[6]}
             python3 count_motifs.py --motif ACGTC --fasta {input[7]} --out {output[7]}
         """
-        
+
+rule process_motif_counts: 
+    input: 
+    output: 
+    shell: 
+    """
+    Rscript plot_motif_counts.R 
+    """    
