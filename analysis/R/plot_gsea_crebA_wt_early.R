@@ -214,7 +214,7 @@ p <- ggplot(data = sub_wt_df, aes(y = reorder(pathway, logpval), x = logpval, fi
   ) + 
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=0, vjust = 1, hjust=1)) +
   ggtitle('Geneset enrichment in stage 10-12 wildtype embryos')  
-ggsave(filename = file.path(TARGET_dir, 'wildtype_selected_ct2_long.png'), width = 11, height = 19)
+ggsave(filename = file.path(TARGET_dir, 'wildtype_selected_ct2_long.png'), width = 11.2, height = 19)
 
 sub_mut_df = mut_df[mut_df$celltype %in% ct_interest, ]
 sub_mut_df$celltype = factor(x = sub_mut_df$celltype, levels = ct_interest)
@@ -244,7 +244,7 @@ p <- ggplot(data = sub_mut_df, aes(y = reorder(pathway, logpval), x = logpval, f
   ) + 
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=0, vjust = 1, hjust=1)) +
   ggtitle('Geneset enrichment in stage 10-12 mutant embryos')  
-ggsave(filename = file.path(TARGET_dir, 'mutant_selected_ct2_long.png'), width = 11, height = 19)
+ggsave(filename = file.path(TARGET_dir, 'mutant_selected_ct2_long.png'), width = 11.2, height = 19)
 
 
 ##### make the wildtype plot - other cts #####
