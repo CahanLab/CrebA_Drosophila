@@ -1,2 +1,2 @@
-We want to know:
-- what are the down stream genes of CrebA in the whole Drosophila embryo and salivary gland 
+# Analysis of CrebA mutant scRNA-seq and CrebA ChIP-seq 
+This repository contains the analysis code for our [manuscript](). The code base for the analysis of the scRNA-seq can be found in [*analysis*](/analysis/) folder. The code base for the analysis of ChIP-seq and scRNA-seq integration can be found in [CrebA_ChIP_Analysis](/CrebA_ChIP_Analysis/). 
