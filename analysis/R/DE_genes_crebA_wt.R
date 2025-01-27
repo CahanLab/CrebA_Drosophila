@@ -2,17 +2,15 @@ TARGET_dir = file.path("results", ANALYSIS_VERSION, "DE_genes_crebA_wt")
 dir.create(TARGET_dir)
 
 wt_object = readRDS(file.path('results', ANALYSIS_VERSION, "harmonized_wildtype_data/stage13-16_reharmonized_seurat.rds"))
-wt_object@meta.data$manual_celltypes = wt_object@meta.data$new_celltypes
-
 mut_object = readRDS(file.path("results", ANALYSIS_VERSION, "manual_annotation_crebA/manual_celltype_object.rds"))
 
-common_celltypes = intersect(wt_object@meta.data$manual_celltypes, mut_object@meta.data$manual_celltypes)
+common_celltypes = intersect(wt_object@meta.data$new_celltypes, mut_object@meta.data$manual_celltypes)
 pathway_list = readRDS('accessory_data/GO_Biological_Processes_2018/GO_Biological_Process.rds')
 
 withr::with_dir(TARGET_dir, {
   for(celltype in common_celltypes) {
     dir.create(stringr::str_replace_all(celltype, "/", "-"))
-    sub_wt_obj = subset(wt_object, subset = manual_celltypes == celltype) 
+    sub_wt_obj = subset(wt_object, subset = new_celltypes == celltype) 
     sub_wt_obj@meta.data$experimental_condition = 'Wt'
     
     sub_mut_obj = subset(mut_object, subset = manual_celltypes == celltype) 
