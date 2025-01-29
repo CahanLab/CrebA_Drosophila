@@ -99,6 +99,14 @@ source("R/plot_gsea_crebA_wt.R")
 # plot out apodemes and optic lobe genes 
 source("R/plot_ap_ol_genes.R")
 
+##### make the supplementary tables #####
+# make the folder path for the figures 
+if(dir.exists(file.path("results", ANALYSIS_VERSION, 'SuppTabs')) == FALSE) {
+  dir.create(file.path("results", ANALYSIS_VERSION, 'SuppTabs'))
+}
+# make supplementary tables 
+source("R/make_supplementary_tables.R")
+
 ###### unused scripts ######
 
 # here are the scripts that did not make it to the main analysis 
