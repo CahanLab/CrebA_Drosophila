@@ -610,14 +610,14 @@ rule process_motif_counts:
     input: 
     output: 
     shell: 
-    """
-    Rscript plot_motif_counts.R 
-    """    
+        """
+        Rscript plot_motif_counts.R 
+        """    
 
 rule make_supp_tab: 
     input: 
     output: 
     shell: 
-    """
-    python make_supplementary_tab.py
-    """
+        """
+        python make_supplementary_tab.py
+        """

@@ -164,3 +164,46 @@ for label in ax.subset_labels:
 plt.savefig(os.path.join(output_path, 'ma_up-sc_up-SPCGs.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
+###### this is the additional analysis that we wanted to do 
+# here are the additional code to see if we should include MA entirely or MA and SPCGs
+MA_scpg = np.intersect1d(MA_down_genes, spcgs_genes)
+venn3([set(bound_genes), set(spcgs_genes), set(np.concatenate((sc_down_genes, insitu_genes, MA_scpg)))], 
+      ('Bound genes', 'SPCGs', 'Activated genes'), 
+      set_colors = [color_palettes['bound'], color_palettes['SPCGs'], color_palettes['activation']], alpha = 0.8)  
+plt.title("CrebA bound and activated genes in " + sc_type) 
+plt.savefig(os.path.join(output_path, 'bound_SPCGs_down_sc_insitu_MA-SPCG_venn.png'), dpi=300, bbox_inches='tight')
+plt.clf()
+
+MA_scpg = np.intersect1d(MA_up_genes, spcgs_genes)
+
+if MA_scpg.size > 0:
+    concatenated_genes = np.concatenate((sc_up_genes, MA_scpg))
+else:
+    concatenated_genes = sc_up_genes
+
+venn2([set(bound_genes), set(concatenated_genes)], 
+      ('Bound genes', 'Repressed Genes'), 
+      set_colors = [color_palettes['bound'], color_palettes['repression']], alpha = 0.8)  
+plt.title("CrebA bound and repressed genes in " + sc_type) 
+plt.savefig(os.path.join(output_path, 'bound_SPCGs_up_sc_MA-SPCG_venn.png'), dpi=300, bbox_inches='tight')
+plt.clf()
+
+# if there is a collision, we go with single-cell and in-situ
+sub_MA_down_genes = np.setdiff1d(MA_down_genes, sc_up_genes)
+
+venn3([set(bound_genes), set(spcgs_genes), set(np.concatenate((sc_down_genes, insitu_genes, sub_MA_down_genes)))], 
+      ('Bound genes', 'SPCGs', 'Activated genes'), 
+      set_colors = [color_palettes['bound'], color_palettes['SPCGs'], color_palettes['activation']], alpha = 0.8)  
+plt.title("CrebA bound and activated genes in " + sc_type) 
+plt.savefig(os.path.join(output_path, 'bound_SPCGs_down_sc_insitu_MA-sub_venn.png'), dpi=300, bbox_inches='tight')
+plt.clf()
+
+sub_MA_up_genes = np.setdiff1d(MA_up_genes, sc_down_genes)
+sub_MA_up_genes = np.unique(sub_MA_up_genes[sub_MA_up_genes != ''])
+
+venn2([set(bound_genes), set(np.concatenate((sc_up_genes, sub_MA_up_genes)))], 
+      ('Bound genes', 'Repressed Genes'), 
+      set_colors = [color_palettes['bound'], color_palettes['repression']], alpha = 0.8)  
+plt.title("CrebA bound and repressed genes in " + sc_type) 
+plt.savefig(os.path.join(output_path, 'bound_SPCGs_up_sc_MA-sub_venn.png'), dpi=300, bbox_inches='tight')
+plt.clf()
