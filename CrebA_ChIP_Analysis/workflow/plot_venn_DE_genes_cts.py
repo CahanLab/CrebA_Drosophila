@@ -12,6 +12,7 @@ color_palette['Salivary Gland'] = '#1f77b4'
 color_palette['Amnioserosa'] = '#ff7f0e'
 color_palette['Plasmatocytes'] = '#2ca02c'
 color_palette['Fat Body'] = '#9467bd'
+color_palette['Trachea'] = '#d62728'  
 
 # make the dictionary of DE genes 
 DE_genes_dict = dict()
@@ -60,15 +61,14 @@ for tmp_combo in ct_combinations:
     plt.savefig(os.path.join(output_path, tmp_combo[0] + "_" + tmp_combo[1] + '_up.png'), dpi=300, bbox_inches='tight')
     plt.clf()
 
-# make the 4 overlaps 
-
-color_palette = ['#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd']
-venn.venn(DE_genes_down_dict, cmap = color_palette, fontsize=16)
-plt.title("Down genes overlap across 4 tissues")
-plt.savefig(os.path.join(output_path, 'all_4cts_down.png'), dpi=300, bbox_inches='tight')
+# make the 5 overlaps 
+color_palette = ['#1f77b4', '#ff7f0e', '#2ca02c', '#9467bd', '#d62728']
+venn.venn(DE_genes_down_dict, cmap = color_palette, fontsize=13, legend_loc = 'upper right')
+plt.title("Down genes overlap across 5 tissues")
+plt.savefig(os.path.join(output_path, 'all_5cts_down.png'), bbox_inches='tight', dpi=600)
 plt.clf()
 
-venn.venn(DE_genes_up_dict, cmap = color_palette, fontsize=16)
-plt.title("Up genes overlap across 4 tissues")
-plt.savefig(os.path.join(output_path, 'all_4cts_up.png'), dpi=300, bbox_inches='tight')
+venn.venn(DE_genes_up_dict, cmap = color_palette, fontsize=13)
+plt.title("Up genes overlap across 5 tissues")
+plt.savefig(os.path.join(output_path, 'all_5cts_up.png'), dpi=600, bbox_inches='tight')
 plt.clf()
