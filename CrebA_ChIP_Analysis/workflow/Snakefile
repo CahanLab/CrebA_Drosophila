@@ -309,6 +309,14 @@ rule fimo_nonfunctional_peak_regions:
         fimo --o {output[0]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme {input[0]}
         fimo --o {output[1]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme {input[1]}
         """
+##### combine all the DE genes from the 5 cell types ##### 
+rule plot_venn_DE_genes_5cts: 
+    input: 
+    output: 
+    shell: 
+        """
+        python3 plot_venn_DE_genes_cts.py
+        """
 
 ###### combine all DE genes from big 4 CTs ######
 # the rule to find bound DE genes 
