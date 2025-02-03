@@ -18,6 +18,10 @@ if (grepl('4cts', args[1])[1] == TRUE) {
   names(color_palette) = c('repression', 'activation')
 }
 
+spcgs = readxl::read_excel("../input/SPCG_files/SPCG List.xlsx")
+flybase_df = read.csv("../input/flybase_gene_conversion/conversion_tab.csv")
+flybase_spcg_df = flybase_df[flybase_df$flybase %in% spcgs$`Drosophila FBgn`, ]
+
 ###### read in all the files ######
 crebA_bound = read.csv(args[2], row.names = 1)
 tss_tab = read.csv("../output/tss_table/tss_table.txt")
@@ -54,9 +58,24 @@ all_bound_data = og_all_bound_data %>%
 write.csv(all_bound_data, file = file.path(output_path, 'all_bound_genes_dist.csv'))
 
 ###### plot out the histogram #####
+include_MA = args[4]
+
 down_DE = read.csv(file.path(args[1], "down_DE.csv"), row.names = 1)
 down_DE = down_DE[down_DE$bound == 'True', ]
-down_DE = down_DE[down_DE$SC_DE == 'True' | down_DE$in_situ_DE == 'True', ]
+
+if(is.na(include_MA) == TRUE) {
+  down_DE = down_DE[down_DE$SC_DE == 'True' | down_DE$in_situ_DE == 'True', ]
+} else {
+  if(include_MA == 'MA_SPCGs') {
+    down_DE = down_DE[down_DE$SC_DE == 'True' | down_DE$in_situ_DE == 'True' | (down_DE$MA_DE == 'True' & down_DE$genes %in% flybase_spcg_df$gene_names), ]
+  }
+  else if(include_MA == 'MA_total') {
+    up_DE = read.csv(file.path(args[1], "up_DE.csv"), row.names = 1)
+    i_genes = intersect(down_DE$genes, up_DE$genes)
+    down_DE = down_DE[down_DE$genes %in% i_genes == FALSE, ]
+  }
+}
+
 rownames(down_DE) = down_DE$genes
 sub_bound_data = all_bound_data[all_bound_data$bound_gene %in% down_DE$genes, ]
 
@@ -72,7 +91,21 @@ ggsave(filename = file.path(output_path, 'activated_genes.png'), plot = p1, widt
 ##### plot out the up regulated genes ##### 
 up_DE = read.csv(file.path(args[1], "up_DE.csv"), row.names = 1)
 up_DE = up_DE[up_DE$bound == 'True', ]
-up_DE = up_DE[up_DE$SC_DE == 'True', ]
+
+if(is.na(include_MA) == TRUE) {
+  up_DE = up_DE[up_DE$SC_DE == 'True', ]
+} else {
+  if(include_MA == 'MA_SPCGs') {
+    up_DE = up_DE[up_DE$SC_DE == 'True' | (up_DE$MA_DE == 'True' & up_DE$genes %in% flybase_spcg_df$gene_names), ]
+  }
+  else if(include_MA == 'MA_total') {
+    down_DE = read.csv(file.path(args[1], "down_DE.csv"), row.names = 1)
+    i_genes = intersect(up_DE$genes, down_DE$genes)  
+    up_DE = up_DE[up_DE$genes %in% i_genes == FALSE, ]
+  }
+}
+
+
 sub_bound_data = all_bound_data[all_bound_data$bound_gene %in% up_DE$genes, ]
 
 p2 = ggplot(sub_bound_data, aes(x = dist_tss)) +

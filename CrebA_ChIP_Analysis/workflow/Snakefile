@@ -677,3 +677,64 @@ rule plot_intersect_bound_genes_5cts:
         """
         python3 plot_intersect_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]} --sc_type "5 celltypes"
         """
+
+rule enrich_bound_DE_genes_MA_spcgs: 
+    input: 
+        directory("../output/find_bound_DE_genes"),
+    output: 
+        directory("../output/enrichment_categorized_DE_genes_SG_SC_MA_spcgs")
+    shell: 
+        """
+        Rscript enrichment_categorized_DE_genes.R {input[0]} {output[0]} MA_SPCGs
+        """
+
+rule plot_distance_from_tss_MA_spcgs: 
+    input: 
+        "../output/find_bound_DE_genes/",
+        '../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv'
+    output: 
+        directory('../output/plot_location_crebA_binding_SG_SC_MA_spcgs')
+    shell: 
+        """
+        Rscript plot_distance_crebA.R {input[0]} {input[1]} {output[0]} MA_SPCGs
+        """
+    
+rule enrich_bound_DE_genes_MA_total: 
+    input: 
+        directory("../output/find_bound_DE_genes"),
+    output: 
+        directory("../output/enrichment_categorized_DE_genes_SG_SC_MA_total")
+    shell: 
+        """
+        Rscript enrichment_categorized_DE_genes.R {input[0]} {output[0]} MA_total
+        """
+rule plot_distance_from_tss_MA_total: 
+    input: 
+        "../output/find_bound_DE_genes/",
+        '../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv'
+    output: 
+        directory('../output/plot_location_crebA_binding_SG_SC_MA_total')
+    shell: 
+        """
+        Rscript plot_distance_crebA.R {input[0]} {input[1]} {output[0]} MA_total
+        """
+
+rule get_functional_peak_regions_MA_total: 
+    input: 
+        '../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv', 
+        '../output/find_bound_DE_genes/down_DE.csv', 
+        '../output/find_bound_DE_genes/up_DE.csv', 
+        '../input/SPCG_files/SPCG List.xlsx'
+    output: 
+        '../output/get_functional_peak_regions/full_peaks.bed', 
+        '../output/get_functional_peak_regions/down_DE_peaks.bed', 
+        '../output/get_functional_peak_regions/up_DE_peaks.bed', 
+        '../output/get_functional_peak_regions/spcg_peaks.bed'
+    shell:
+        """
+        mkdir -p ../output/get_functional_peak_regions
+        python3 get_functional_peak_beds.py --bed {input[0]} --out {output[0]}
+        python3 get_functional_peak_beds.py --bed {input[0]} --DE_genes {input[1]} --out {output[1]}
+        python3 get_functional_peak_beds.py --bed {input[0]} --DE_genes {input[2]} --out {output[2]}
+        python3 get_functional_peak_beds.py --bed {input[0]} --spcg ../input/SPCG_files/SPCG\ List.xlsx --out {output[3]}
+        """

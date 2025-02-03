@@ -188,20 +188,22 @@ plt.title("CrebA bound and repressed genes in " + sc_type)
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_up_sc_MA-SPCG_venn.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
-# if there is a collision, we go with single-cell and in-situ
-sub_MA_down_genes = np.setdiff1d(MA_down_genes, sc_up_genes)
+# if there is a collision, we remove the collision
+sub_sc_down_genes = np.setdiff1d(sc_down_genes, MA_up_genes)
+sub_MA_down_genes = np.setdiff1d(MA_down_genes, np.concatenate((sc_up_genes, MA_up_genes)))
 
-venn3([set(bound_genes), set(spcgs_genes), set(np.concatenate((sc_down_genes, insitu_genes, sub_MA_down_genes)))], 
+venn3([set(bound_genes), set(spcgs_genes), set(np.concatenate((sub_sc_down_genes, insitu_genes, sub_MA_down_genes)))], 
       ('Bound genes', 'SPCGs', 'Activated genes'), 
       set_colors = [color_palettes['bound'], color_palettes['SPCGs'], color_palettes['activation']], alpha = 0.8)  
 plt.title("CrebA bound and activated genes in " + sc_type) 
 plt.savefig(os.path.join(output_path, 'bound_SPCGs_down_sc_insitu_MA-sub_venn.png'), dpi=300, bbox_inches='tight')
 plt.clf()
 
-sub_MA_up_genes = np.setdiff1d(MA_up_genes, sc_down_genes)
+sub_sc_up_genes = np.setdiff1d(sc_up_genes, MA_down_genes)
+sub_MA_up_genes = np.setdiff1d(MA_up_genes, np.concatenate((sc_down_genes, insitu_genes, MA_down_genes)))
 sub_MA_up_genes = np.unique(sub_MA_up_genes[sub_MA_up_genes != ''])
 
-venn2([set(bound_genes), set(np.concatenate((sc_up_genes, sub_MA_up_genes)))], 
+venn2([set(bound_genes), set(np.concatenate((sub_sc_up_genes, sub_MA_up_genes)))], 
       ('Bound genes', 'Repressed Genes'), 
       set_colors = [color_palettes['bound'], color_palettes['repression']], alpha = 0.8)  
 plt.title("CrebA bound and repressed genes in " + sc_type) 
