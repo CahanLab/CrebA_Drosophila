@@ -34,8 +34,8 @@ if sc_type == 'salivary gland':
     bracket_name = '(SG)'
 elif sc_type == 'majority 4cts':
     bracket_name = '(≥3/4 cts)'
-elif sc_type == '4 cts':
-    bracket_name = '(4 cts)'
+else:
+    bracket_name = '(' + sc_type + ')'
 
 # create the directory if needed 
 if os.path.isdir(output_path) == False:

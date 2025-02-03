@@ -15,6 +15,7 @@ parser.add_argument(
     type=str,   # Specify the type for each item in the list
     help='A list of celltypes'
 )
+parser.add_argument('--include_late_sg', type=str, help = 'whether to include the late SG genes', default = 'no')
 
 parser.add_argument('--out', type=str, help = 'the output path')
 args = parser.parse_args()
@@ -22,6 +23,7 @@ args = parser.parse_args()
 bound_genes_file = args.boundGenes 
 cts_list = args.cts
 output_path = args.out
+include_late_sg = args.include_late_sg
 
 # create the directory if needed 
 if os.path.isdir(output_path) == False:
@@ -34,6 +36,15 @@ DE_genes_down_dict = dict()
 
 for tmp_key in cts_list: 
     DE_genes_dict[tmp_key] = pd.read_csv("../../analysis/results/v19/DE_genes_early_crebA_wt/" + tmp_key + "/mut_DE_genes.csv", index_col = 0)
+    DE_genes_dict[tmp_key] = DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['pval'] < 0.05, :].copy()
+    DE_genes_dict[tmp_key] = DE_genes_dict[tmp_key].loc[np.abs(DE_genes_dict[tmp_key]['logFC']) > 0.15, :].copy()
+    DE_genes_down_dict[tmp_key] = np.array(DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['logFC'] < 0, 'feature'])
+    DE_genes_up_dict[tmp_key] = np.array(DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['logFC'] > 0, 'feature'])
+
+if include_late_sg == 'yes':
+    tmp_key = 'late_Salivary Gland'
+    cts_list.append(tmp_key)
+    DE_genes_dict[tmp_key] = pd.read_csv("../../analysis/results/v19/DE_genes_crebA_wt/" + "Salivary Gland/mut_DE_genes.csv", index_col = 0)
     DE_genes_dict[tmp_key] = DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['pval'] < 0.05, :].copy()
     DE_genes_dict[tmp_key] = DE_genes_dict[tmp_key].loc[np.abs(DE_genes_dict[tmp_key]['logFC']) > 0.15, :].copy()
     DE_genes_down_dict[tmp_key] = np.array(DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['logFC'] < 0, 'feature'])
