@@ -42,8 +42,10 @@ if(is.na(include_MA) == TRUE) {
     up_DE_genes = up_DE_genes[up_DE_genes$bound == 'True' & (up_DE_genes$SC_DE == 'True' | (up_DE_genes$MA_DE == 'True' & up_DE_genes$genes %in% flybase_spcg_df$gene_names)), ]
   }
   else if(include_MA == 'MA_total') {
-    down_DE_genes = down_DE_genes[down_DE_genes$bound == 'True' & (down_DE_genes$SC_DE == 'True' | down_DE_genes$in_situ_DE == 'True' | down_DE_genes$MA_DE == 'True'), ]
-    up_DE_genes = up_DE_genes[up_DE_genes$bound == 'True' & (up_DE_genes$SC_DE == 'True' | up_DE_genes$MA_DE == 'True'), ]
+    i_genes = intersect(down_DE_genes$genes, up_DE_genes$genes)
+    print(i_genes)
+    down_DE_genes = down_DE_genes[down_DE_genes$genes %in% i_genes == FALSE, ]
+    up_DE_genes = up_DE_genes[up_DE_genes$genes %in% i_genes == FALSE, ]
   }
   
 }
@@ -93,7 +95,12 @@ p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = t
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=0, vjust = 1, hjust=1)) +
   ggtitle('Geneset enrichment of CrebA bound and functional genes')  
 
-ggsave(filename = file.path(TARGET_dir, 'enrichment_analysis.png'), plot = p, height = 10, width = 18)
+if(include_MA == 'MA_total') {
+  ggsave(filename = file.path(TARGET_dir, 'enrichment_analysis.png'), plot = p, height = 10, width = 24)
+
+} else {
+  ggsave(filename = file.path(TARGET_dir, 'enrichment_analysis.png'), plot = p, height = 10, width = 18)
+}
 
 ##### remove the spcgs ##### 
 down_genes = down_genes[down_genes %in% flybase_spcg_df$gene_names == FALSE]
@@ -141,4 +148,8 @@ p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = t
   theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=0, vjust = 1, hjust=1)) +
   ggtitle('Geneset enrichment of CrebA bound and functional genes (no SPCGs)')  
 
-ggsave(filename = file.path(TARGET_dir, 'enrichment_no_spcg_analysis.png'), plot = p, height = 10, width = 19)
+if(include_MA == 'MA_total') {
+  ggsave(filename = file.path(TARGET_dir, 'enrichment_no_spcg_analysis.png'), plot = p, height = 10, width = 24)
+} else {
+  ggsave(filename = file.path(TARGET_dir, 'enrichment_no_spcg_analysis.png'), plot = p, height = 10, width = 19)
+}

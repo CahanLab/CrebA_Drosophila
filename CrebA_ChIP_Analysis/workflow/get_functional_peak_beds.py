@@ -9,6 +9,8 @@ parser.add_argument('--bed', type=str, help = 'the path for the bed files')
 parser.add_argument('--DE_genes', type = str, help = 'the path for DE genes', default='')
 parser.add_argument('--spcg', type = str, help = 'the path for SPCGs', default='')
 parser.add_argument('--out', type=str, help = 'the output path')
+parser.add_argument('--MA_include', type=str, help = 'whether to include MA', default='No')
+
 args = parser.parse_args()
 
 bed_input = args.bed 
