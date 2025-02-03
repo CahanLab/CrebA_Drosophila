@@ -9,7 +9,14 @@ args = commandArgs(trailingOnly = TRUE)
 
 input_dir = file.path(args[1])
 TARGET_dir = file.path(args[2])
+include_MA = args[3]
+
 dir.create(TARGET_dir, recursive = TRUE)
+
+# load in spcgs 
+spcgs = readxl::read_excel("../input/SPCG_files/SPCG List.xlsx")
+flybase_df = read.csv("../input/flybase_gene_conversion/conversion_tab.csv")
+flybase_spcg_df = flybase_df[flybase_df$flybase %in% spcgs$`Drosophila FBgn`, ]
 
 ##### get the DE genes ###### 
 down_DE_genes = read.csv(file.path(input_dir, "down_DE.csv"), row.names = 1)
@@ -26,8 +33,20 @@ if (grepl('4cts', input_dir)[1] == TRUE) {
 }
 
 # only select the down DE genes that are in sc and bound 
-down_DE_genes = down_DE_genes[down_DE_genes$bound == 'True' & (down_DE_genes$SC_DE == 'True' | down_DE_genes$in_situ_DE == 'True'), ]
-up_DE_genes = up_DE_genes[up_DE_genes$bound == 'True' & up_DE_genes$SC_DE == 'True', ]
+if(is.na(include_MA) == TRUE) {
+  down_DE_genes = down_DE_genes[down_DE_genes$bound == 'True' & (down_DE_genes$SC_DE == 'True' | down_DE_genes$in_situ_DE == 'True'), ]
+  up_DE_genes = up_DE_genes[up_DE_genes$bound == 'True' & up_DE_genes$SC_DE == 'True', ]
+} else {
+  if(include_MA == 'MA_SPCGs') {
+    down_DE_genes = down_DE_genes[down_DE_genes$bound == 'True' & (down_DE_genes$SC_DE == 'True' | down_DE_genes$in_situ_DE == 'True' | (down_DE_genes$MA_DE == 'True' & down_DE_genes$genes %in% flybase_spcg_df$gene_names)), ]
+    up_DE_genes = up_DE_genes[up_DE_genes$bound == 'True' & (up_DE_genes$SC_DE == 'True' | (up_DE_genes$MA_DE == 'True' & up_DE_genes$genes %in% flybase_spcg_df$gene_names)), ]
+  }
+  else if(include_MA == 'MA_total') {
+    down_DE_genes = down_DE_genes[down_DE_genes$bound == 'True' & (down_DE_genes$SC_DE == 'True' | down_DE_genes$in_situ_DE == 'True' | down_DE_genes$MA_DE == 'True'), ]
+    up_DE_genes = up_DE_genes[up_DE_genes$bound == 'True' & (up_DE_genes$SC_DE == 'True' | up_DE_genes$MA_DE == 'True'), ]
+  }
+  
+}
 
 ##### categorize them ##### 
 down_genes = down_DE_genes[, 'genes']
@@ -77,11 +96,6 @@ p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = t
 ggsave(filename = file.path(TARGET_dir, 'enrichment_analysis.png'), plot = p, height = 10, width = 18)
 
 ##### remove the spcgs ##### 
-# load in spcgs 
-spcgs = readxl::read_excel("../input/SPCG_files/SPCG List.xlsx")
-flybase_df = read.csv("../input/flybase_gene_conversion/conversion_tab.csv")
-flybase_spcg_df = flybase_df[flybase_df$flybase %in% spcgs$`Drosophila FBgn`, ]
-
 down_genes = down_genes[down_genes %in% flybase_spcg_df$gene_names == FALSE]
 
 enriched <- enrichR::enrichr(down_genes, 'GO_Biological_Process_2018')

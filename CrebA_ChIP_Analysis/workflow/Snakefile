@@ -629,3 +629,51 @@ rule make_supp_tab:
         """
         python make_supplementary_tab.py
         """
+
+#####################
+
+# this is to just run tests to answer some questions 
+rule find_bound_DE_genes_early_late_sg: 
+    input: 
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
+    output: 
+        directory("../output/find_bound_DE_genes_early_late_sg"),
+        directory("../output/enrichment_categorized_DE_genes_early_late_sg")
+    shell: 
+        """
+        python3 find_bound_DE_genes.py --boundGenes {input[0]} --cts "Salivary Gland" --out {output[0]} --include_late_sg yes
+        Rscript enrichment_categorized_DE_genes.R {output[0]} {output[1]}
+        """
+
+rule plot_intersect_bound_genes_early_late_sg: 
+    input: 
+        "../output/find_bound_DE_genes_early_late_sg",
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
+    output: 
+        directory("../output/bound_spcg_DE_venn_early_late_sg")
+    shell: 
+        """
+        python3 plot_intersect_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]} --sc_type "salivary gland"
+        """
+
+rule find_bound_DE_genes_5cts: 
+    input: 
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
+    output: 
+        directory("../output/find_bound_DE_genes_5cts"),
+        directory("../output/enrichment_categorized_DE_genes_5cts")
+    shell: 
+        """
+        python3 find_bound_DE_genes.py --boundGenes {input[0]} --cts "Salivary Gland" "Amnioserosa" "Plasmatocytes" "Fat Body" "Trachea" --out {output[0]} 
+        Rscript enrichment_categorized_DE_genes.R {output[0]} {output[1]}
+        """
+rule plot_intersect_bound_genes_5cts: 
+    input: 
+        "../output/find_bound_DE_genes_5cts",
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
+    output: 
+        directory("../output/bound_spcg_DE_venn_5cts")
+    shell: 
+        """
+        python3 plot_intersect_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]} --sc_type "5 celltypes"
+        """
