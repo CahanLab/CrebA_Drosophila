@@ -16,6 +16,8 @@ library("cowplot")
 library("scales")
 library("enrichR")
 library("openxlsx")
+library("ggrepel")
+
 enrichR::setEnrichrSite('FlyEnrichr')
 
 # This logs package versions etc; good for reproducibility

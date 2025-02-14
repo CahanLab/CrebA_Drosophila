@@ -16,7 +16,6 @@ parser.add_argument(
     help='A list of celltypes'
 )
 parser.add_argument('--include_late_sg', type=str, help = 'whether to include the late SG genes', default = 'no')
-
 parser.add_argument('--out', type=str, help = 'the output path')
 args = parser.parse_args()
 
