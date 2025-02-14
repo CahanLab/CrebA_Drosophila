@@ -56,9 +56,10 @@ if scRNA_results == '':
                                                 bed_file['nearest_gene_2'].isin(functional_genes) == False), :]
 else: 
     scRNA_DE = pd.read_csv(scRNA_results, index_col=0)
+    scRNA_DE.index = scRNA_DE['feature']
     scRNA_DE = scRNA_DE.loc[scRNA_DE.index.isin(functional_genes) == False, :] # not funcitonal genes
     scRNA_DE = scRNA_DE.loc[scRNA_DE.index.isin(bound_genes), :] # intersect with bound genes
-    scRNA_DE = scRNA_DE.sort_values(by='avg_log2FC', key=abs) # rank by log2FC 
+    scRNA_DE = scRNA_DE.sort_values(by='logFC', key=abs) # rank by log2FC 
     sub_scRNA_DE = scRNA_DE.iloc[0:num_genes, :] # get least top DE genes
     sub_bed_file = bed_file.loc[np.logical_or(bed_file['nearest_gene_1'].isin(sub_scRNA_DE.index), 
                                             bed_file['nearest_gene_2'].isin(sub_scRNA_DE.index)), :]

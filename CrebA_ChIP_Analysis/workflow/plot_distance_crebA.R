@@ -73,6 +73,10 @@ if(is.na(include_MA) == TRUE) {
     up_DE = read.csv(file.path(args[1], "up_DE.csv"), row.names = 1)
     i_genes = intersect(down_DE$genes, up_DE$genes)
     down_DE = down_DE[down_DE$genes %in% i_genes == FALSE, ]
+  } else if(include_MA == "MA_SG") {
+    SG_genes = read.csv("../../analysis/results/v19/early_wt_gsea/Salivary Gland/markers_genes.csv", row.names = 1)
+    SG_genes = SG_genes[SG_genes$pct.1 >= 0.1, ]
+    down_DE = down_DE[down_DE$bound == 'True' & (down_DE$SC_DE == 'True' | down_DE$in_situ_DE == 'True' | (down_DE$MA_DE == 'True' & down_DE$genes %in% rownames(SG_genes))), ]
   }
 }
 
@@ -83,7 +87,7 @@ p1 = ggplot(sub_bound_data, aes(x = dist_tss)) +
   geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 100, fill = color_palette[['activation']]) + 
   xlim(c(-1500, 1500)) + 
   ylab("Percentage") +
-  xlab("Distance away from TSS") +
+  xlab("Distance away most 5' TSS") +
   ggtitle('CrebA activated and functional genes') +
   cowplot::theme_cowplot()
 ggsave(filename = file.path(output_path, 'activated_genes.png'), plot = p1, width = 5, height = 4)
@@ -103,6 +107,9 @@ if(is.na(include_MA) == TRUE) {
     i_genes = intersect(up_DE$genes, down_DE$genes)  
     up_DE = up_DE[up_DE$genes %in% i_genes == FALSE, ]
   }
+  else if(include_MA == 'MA_SG') {
+    up_DE = up_DE[up_DE$SC_DE == 'True', ]
+  }
 }
 
 
@@ -112,7 +119,7 @@ p2 = ggplot(sub_bound_data, aes(x = dist_tss)) +
   geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 100, fill = color_palette[['repression']]) + 
   xlim(c(-1500, 1500)) + 
   ylab("Percentage") +
-  xlab("Distance away from TSS") +
+  xlab("Distance from most 5' TSS") +
   ggtitle('CrebA repressed and functional genes') +
   cowplot::theme_cowplot()
 ggsave(filename = file.path(output_path, 'repressed_genes.png'), plot = p2, width = 5, height = 4)
@@ -128,7 +135,7 @@ p3 = ggplot(sub_bound_data, aes(x = dist_tss)) +
   geom_histogram(aes(y = ..count../sum(..count..)), binwidth = 100, fill = '#87ceeb') + 
   xlim(c(-1500, 1500)) + 
   ylab("Percentage") +
-  xlab("Distance away from TSS") +
+  xlab("Distance from 5' TSS") +
   ggtitle('CrebA bound SPCGs') +
   cowplot::theme_cowplot()
 ggsave(filename = file.path(output_path, 'bound_SPCGs_genes.png'), plot = p3, width = 5, height = 4)
@@ -150,13 +157,13 @@ for (tmp_index in rownames(crebA_bound)) {
   }
 }
 
-plot_df = data.frame('ChIP_peaks' = c('none', 'double', 'single'), 
-                     'number' = c(num_none, num_double, num_single))
+plot_df = data.frame(ChIP_peaks = c('0', '1', '2'), 
+                     number = c(num_none, num_single, num_double))
 
 p4 = ggplot(plot_df, aes(x = ChIP_peaks, y = number)) + 
   geom_bar(stat = "identity", fill = "skyblue") +
-  ylab("number") + 
-  xlab("ChIP peaks") + 
+  ylab("# of CrebA peaks") + 
+  xlab("# of bound genes") + 
   theme_cowplot()
 
 ggsave(filename = file.path(output_path, 'proportion_peaks.png'), plot = p4, width = 4, height = 4)

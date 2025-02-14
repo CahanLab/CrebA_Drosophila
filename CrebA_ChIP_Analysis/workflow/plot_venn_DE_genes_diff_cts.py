@@ -26,6 +26,10 @@ for tmp_key in color_palette.keys():
     DE_genes_down_dict[tmp_key] = set(DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['logFC'] < 0, 'feature'])
     DE_genes_up_dict[tmp_key] = set(DE_genes_dict[tmp_key].loc[DE_genes_dict[tmp_key]['logFC'] > 0, 'feature'])
 
+my_genes = list()
+for tmp_key in DE_genes_down_dict.keys():
+    my_genes.extend(DE_genes_down_dict[tmp_key])
+my_genes = np.unique(list(set(my_genes)))
 
 output_path = "../output/ct_genes_comparison"
 if os.path.isdir(output_path) == False:
