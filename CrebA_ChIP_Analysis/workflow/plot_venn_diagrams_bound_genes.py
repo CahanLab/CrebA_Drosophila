@@ -168,7 +168,11 @@ plt.clf()
 SG_genes = pd.read_csv("../../analysis/results/v19/early_wt_gsea/Salivary Gland/markers_genes.csv", index_col = 0)
 SG_genes = SG_genes.loc[SG_genes['pct.1'] >= 0.1, :]
 
+mut_diff_genes = pd.read_csv("../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", index_col = 0)
+mut_diff_genes = mut_diff_genes.loc[mut_diff_genes['logFC'] < 0, :]
+
 MA_SG = np.intersect1d(MA_down_genes, SG_genes.index)
+MA_SG = np.intersect1d(MA_SG, mut_diff_genes['feature'])
 venn3([set(bound_genes), set(spcgs_genes), set(np.concatenate((sc_down_genes, insitu_genes, MA_SG)))], 
       ('Bound genes', 'SPCGs', 'Activated genes'), 
       set_colors = [color_palettes['bound'], color_palettes['SPCGs'], color_palettes['activation']], alpha = 0.8)  

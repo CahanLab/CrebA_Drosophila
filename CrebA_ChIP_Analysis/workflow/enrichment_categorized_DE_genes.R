@@ -50,7 +50,12 @@ if(is.na(include_MA) == TRUE) {
     SG_genes = read.csv("../../analysis/results/v19/early_wt_gsea/Salivary Gland/markers_genes.csv", row.names = 1)
     SG_genes = SG_genes[SG_genes$pct.1 >= 0.1, ]
     
-    down_DE_genes = down_DE_genes[down_DE_genes$bound == 'True' & (down_DE_genes$SC_DE == 'True' | down_DE_genes$in_situ_DE == 'True' | (down_DE_genes$MA_DE == 'True' & down_DE_genes$genes %in% rownames(SG_genes))), ]
+    # load in the diff expressed genes between mutants and wildtype
+    mut_diff_genes = read.csv("../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", row.names = 1)
+    mut_diff_genes = mut_diff_genes[mut_diff_genes$logFC < 0, ]
+    MA_select_genes = intersect(rownames(SG_genes), mut_diff_genes$feature)
+    
+    down_DE_genes = down_DE_genes[down_DE_genes$bound == 'True' & (down_DE_genes$SC_DE == 'True' | down_DE_genes$in_situ_DE == 'True' | (down_DE_genes$MA_DE == 'True' & down_DE_genes$genes %in% MA_select_genes)), ]
     up_DE_genes = up_DE_genes[up_DE_genes$bound == 'True' & (up_DE_genes$SC_DE == 'True'), ]
   }
 }

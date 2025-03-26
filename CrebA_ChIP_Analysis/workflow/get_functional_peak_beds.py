@@ -61,10 +61,15 @@ elif spcg_input == '' and DE_genes != "":
             SG_genes = pd.read_csv("../../analysis/results/v19/early_wt_gsea/Salivary Gland/markers_genes.csv", index_col = 0)
             SG_genes = SG_genes.loc[SG_genes['pct.1'] >= 0.1, :]
             
+            mut_diff_genes = pd.read_csv("../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", index_col = 0)
+            mut_diff_genes = mut_diff_genes.loc[mut_diff_genes['logFC'] < 0, :]
+
+            MA_SG = np.intersect1d(SG_genes.index, mut_diff_genes['feature'])
+
             # SC or in situ DE 
             SC_insitu_index = np.logical_or(DE_genes_df['SC_DE'] == True, DE_genes_df['in_situ_DE'] == True)
             # MA DE and SG genes
-            MA_SG_index = np.logical_and(DE_genes_df['MA_DE'] == True, DE_genes_df['genes'].isin(SG_genes.index))
+            MA_SG_index = np.logical_and(DE_genes_df['MA_DE'] == True, DE_genes_df['genes'].isin(MA_SG))
             # either first condition or second condition
             all_index = np.logical_or(SC_insitu_index, MA_SG_index)
 
