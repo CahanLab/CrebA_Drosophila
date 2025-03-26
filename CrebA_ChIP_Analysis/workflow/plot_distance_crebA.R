@@ -76,7 +76,13 @@ if(is.na(include_MA) == TRUE) {
   } else if(include_MA == "MA_SG") {
     SG_genes = read.csv("../../analysis/results/v19/early_wt_gsea/Salivary Gland/markers_genes.csv", row.names = 1)
     SG_genes = SG_genes[SG_genes$pct.1 >= 0.1, ]
-    down_DE = down_DE[down_DE$bound == 'True' & (down_DE$SC_DE == 'True' | down_DE$in_situ_DE == 'True' | (down_DE$MA_DE == 'True' & down_DE$genes %in% rownames(SG_genes))), ]
+      
+    mut_diff_genes = read.csv("../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", row.names = 1)
+    mut_diff_genes = mut_diff_genes[mut_diff_genes$logFC < 0, ]
+    MA_select_genes = intersect(rownames(SG_genes), mut_diff_genes$feature)
+
+    down_DE = down_DE[down_DE$bound == 'True' & (down_DE$SC_DE == 'True' | down_DE$in_situ_DE == 'True' | (down_DE$MA_DE == 'True' & down_DE$genes %in% MA_select_genes)), ]
+    print(nrow(down_DE))
   }
 }
 

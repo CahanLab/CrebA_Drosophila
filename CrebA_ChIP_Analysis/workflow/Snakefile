@@ -1,3 +1,8 @@
+rule all:
+    input:
+        "../input/flybase_gene_conversion/conversion_tab.csv",
+        "../input/previous_CrebA_motifs/CrebAMotifs_meme.meme",
+        "../output/tss_table/promoter_regions.bed"
 
 ###### standard curation of the input ######
 # construct a conversion table between flybase id and gene name 
@@ -238,6 +243,7 @@ rule process_motif_counts:
         Rscript plot_motif_counts.R 
         """  
 
+##### this is to  make the non-functional regions #####
 rule get_nonfunctional_peak_regions:
     input: 
         '../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv',
@@ -304,6 +310,7 @@ rule tomtom_nonfunctional_peak_regions:
         tomtom {input[1]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[1]}
         """
 
+##### this is for all the analysis of the 5 cell types #####
 rule plot_venn_5cts_DE_genes: 
     input: 
     output: 
