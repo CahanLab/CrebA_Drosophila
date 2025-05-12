@@ -38,4 +38,5 @@ CrebA_ChIP_Analysis/workflow/.snakemake/*
 
 CrebA_ChIP_Analysis/output_old/*
 CrebA_ChIP_Analysis/output_old2/*
+CrebA_ChIP_Analysis/output_old3/*
 CrebA_ChIP_Analysis/workflow/Snakefile_old/*

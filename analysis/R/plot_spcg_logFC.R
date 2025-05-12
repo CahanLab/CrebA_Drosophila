@@ -97,6 +97,59 @@ p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', 
   ggtitle("Stage 10-12 Embryos")
 ggsave(filename = file.path(TARGET_dir, "stage10-12_logFC.png"), plot = p, width = 32, height = 7)
 
+# yellow and purple 
+p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', fill = 'logFC')) +
+  geom_tile() +
+  guides(fill = guide_colorbar(title = 'logFC', barwidth=30)) +
+  scale_fill_gradient2(low = "#d4ad00", mid = "white", high = '#6f02b8', 
+                       midpoint = 0, limits = c(-1.6, 0.5)) +
+  labs(
+    x = 'Secretory Pathway Component Genes',
+    y = 'Cell Types'
+  ) + 
+  facet_grid(
+    cols = vars(spcg_cat),
+    scales = "free_x",
+    space = "free_x",
+    switch = "y"
+  ) + 
+  theme(
+    panel.spacing = unit(x = 1, units = "lines"),
+    strip.background = element_blank()
+  ) + 
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), 
+        axis.text = element_text(size=18), text = element_text(size = 18), 
+        legend.position = 'bottom') +
+  ggtitle("Stage 10-12 Embryos")
+ggsave(filename = file.path(TARGET_dir, "stage10-12_logFC_yellow_purple.png"), plot = p, width = 32, height = 7)
+
+# purple and yellow
+p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', fill = 'logFC')) +
+  geom_tile() +
+  guides(fill = guide_colorbar(title = 'logFC', barwidth=30)) +
+  scale_fill_gradient2(low = "#6f02b8", mid = "white", high = '#d4ad00', 
+                       midpoint = 0, limits = c(-1.6, 0.5)) +
+  labs(
+    x = 'Secretory Pathway Component Genes',
+    y = 'Cell Types'
+  ) + 
+  facet_grid(
+    cols = vars(spcg_cat),
+    scales = "free_x",
+    space = "free_x",
+    switch = "y"
+  ) + 
+  theme(
+    panel.spacing = unit(x = 1, units = "lines"),
+    strip.background = element_blank()
+  ) + 
+  theme(strip.text.x = element_blank(), axis.text.x=element_text(angle=45, vjust = 1, hjust=1), 
+        axis.text = element_text(size=18), text = element_text(size = 18), 
+        legend.position = 'bottom') +
+  ggtitle("Stage 10-12 Embryos")
+ggsave(filename = file.path(TARGET_dir, "stage10-12_logFC_purple_yellow.png"), plot = p, width = 32, height = 7)
+
+
 ##### load and compile the late data #####
 plot_df = data.frame()
 ct_list = list.dirs(file.path('results', ANALYSIS_VERSION, 'DE_genes_crebA_wt'), full.names = FALSE, recursive = FALSE)

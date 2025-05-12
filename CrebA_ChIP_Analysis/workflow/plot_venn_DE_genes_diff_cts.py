@@ -76,3 +76,43 @@ venn.venn(DE_genes_up_dict, cmap = color_palette, fontsize=13)
 plt.title("Up genes overlap across 5 tissues")
 plt.savefig(os.path.join(output_path, 'all_5cts_up.png'), dpi=600, bbox_inches='tight')
 plt.clf()
+
+# get the statistics of non-unique genes for manuscript purposes 
+target_ct = 'Salivary Gland'
+sg_genes = DE_genes_down_dict[target_ct]
+other_genes = []
+for tmp_key in DE_genes_down_dict.keys():
+    if tmp_key != 'Salivary Gland':
+        other_genes.extend(DE_genes_down_dict[tmp_key])
+other_genes = np.unique(list(set(other_genes)))
+len(np.intersect1d(list(sg_genes), other_genes)) / len(list(sg_genes))
+
+# do it for trachea 
+target_ct = 'Trachea'
+target_genes = DE_genes_down_dict[target_ct]
+other_genes = []
+for tmp_key in DE_genes_down_dict.keys():
+    if tmp_key != target_ct:
+        other_genes.extend(DE_genes_down_dict[tmp_key])
+other_genes = np.unique(list(set(other_genes)))
+len(np.intersect1d(list(target_genes), other_genes)) / len(list(target_genes))
+
+# do it for Fat body 
+target_ct = 'Fat Body'
+target_genes = DE_genes_down_dict[target_ct]
+other_genes = []
+for tmp_key in DE_genes_down_dict.keys():
+    if tmp_key != target_ct:
+        other_genes.extend(DE_genes_down_dict[tmp_key])
+other_genes = np.unique(list(set(other_genes)))
+len(np.intersect1d(list(target_genes), other_genes)) / len(list(target_genes))
+
+# do it for Plasmatocytes
+target_ct = 'Plasmatocytes'
+target_genes = DE_genes_down_dict[target_ct]
+other_genes = []
+for tmp_key in DE_genes_down_dict.keys():
+    if tmp_key != target_ct:
+        other_genes.extend(DE_genes_down_dict[tmp_key])
+other_genes = np.unique(list(set(other_genes)))
+len(np.intersect1d(list(target_genes), other_genes)) / len(list(target_genes))

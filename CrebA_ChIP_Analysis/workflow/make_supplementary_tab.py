@@ -6,8 +6,6 @@ import numpy as np
 DE_genes_path = "../output/find_bound_SG_DE_genes"
 bound_genes_path = "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
 
-SG_genes = pd.read_csv("../../analysis/results/v19/early_wt_gsea/Salivary Gland/markers_genes.csv", index_col = 0)
-SG_genes = SG_genes.loc[SG_genes['pct.1'] >= 0.1, :]
 
 # get the spcgs 
 spcg_df = pd.read_excel('../input/SPCG_files/SPCG List.xlsx')
@@ -39,7 +37,6 @@ sc_down_genes = np.unique(sc_down_DE_genes_df['genes'])
 
 ma_down_DE_genes_df = down_DE_genes_df.loc[down_DE_genes_df['MA_DE'] == True, :]
 MA_down_genes = np.unique(ma_down_DE_genes_df['genes'])
-MA_SG_down_genes = np.intersect1d(MA_down_genes, SG_genes.index)
 
 insitu_down_DE_genes_df = down_DE_genes_df.loc[down_DE_genes_df['in_situ_DE'] == True, :]
 insitu_genes = np.unique(insitu_down_DE_genes_df['genes'])
@@ -58,6 +55,15 @@ MA_up_genes = np.unique(ma_up_DE_genes_df['genes'])
 all_genes = np.concatenate((sc_down_genes, MA_down_genes, insitu_genes, sc_up_genes, MA_up_genes, bound_genes))
 all_genes = np.unique(all_genes)
 
+SG_genes = pd.read_csv("../../analysis/results/v19/early_wt_gsea/Salivary Gland/markers_genes.csv", index_col = 0)
+SG_genes = SG_genes.loc[SG_genes['pct.1'] >= 0.1, :]
+
+mut_diff_genes = pd.read_csv("../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", index_col = 0)
+mut_diff_genes = mut_diff_genes.loc[mut_diff_genes['logFC'] < 0, :]
+
+MA_SG = np.intersect1d(MA_down_genes, SG_genes.index)
+MA_SG = np.intersect1d(MA_SG, mut_diff_genes['feature'])
+
 # create a dataframe
 supp_tab = pd.DataFrame(all_genes, columns = ['genes'])
 
@@ -67,19 +73,14 @@ supp_tab['bound'] = supp_tab['genes'].isin(bound_genes)
 # add the spcg column
 supp_tab['SPCG'] = supp_tab['genes'].isin(spcgs_genes)
 
-# add the sc down column
-supp_tab['SC_CrebA_activated'] = supp_tab['genes'].isin(sc_down_genes)
-# add the MA down column
-supp_tab['MA_CrebA_activated'] = supp_tab['genes'].isin(MA_down_genes)
-supp_tab['MA_SG_CrebA_activated'] = supp_tab['genes'].isin(MA_SG_down_genes)
-         
-# add the insitu down column
-supp_tab['insitu_CrebA_activated'] = supp_tab['genes'].isin(insitu_genes)
+# add the activated genes 
+activated_genes = np.unique(list(sc_down_genes) + list(insitu_genes) + list(MA_SG))
 
-# add the sc up column
-supp_tab['SC_CrebA_repressed'] = supp_tab['genes'].isin(sc_up_genes)
-# add the MA up column
-supp_tab['MA_CrebA_repressed'] = supp_tab['genes'].isin(MA_up_genes)
+# add the repressed genes 
+repressed_genes = sc_up_genes
+
+supp_tab['activated_genes'] = supp_tab['genes'].isin(activated_genes)
+supp_tab['repressed_genes'] = supp_tab['genes'].isin(repressed_genes)   
 
 # save the dataframe 
 os.makedirs("../output/supplementary_table", exist_ok=True)
