@@ -9,6 +9,7 @@ for(i in seq(1, nrow(spcg_tab))) {
   }
 }
 
+# these SPCGs show near zero expression across all cell types. 
 spcg_tab = spcg_tab[spcg_tab$`Drosophila Gene` %in% c('CG9356',
                                                       'Cog1',
                                                       'Cog2',

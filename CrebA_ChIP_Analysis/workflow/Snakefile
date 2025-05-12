@@ -1,8 +1,5 @@
-rule all:
-    input:
-        "../input/flybase_gene_conversion/conversion_tab.csv",
-        "../input/previous_CrebA_motifs/CrebAMotifs_meme.meme",
-        "../output/tss_table/promoter_regions.bed"
+rule targets: 
+    input: 
 
 ###### standard curation of the input ######
 # construct a conversion table between flybase id and gene name 
@@ -185,8 +182,8 @@ rule tomtom_functional_peak_regions:
 
 rule plot_dreme_functional_peak_logos: 
     input:
-        directory("../output/get_functional_peak_regions_SG/dreme_up_DE_peaks"), 
-        directory("../output/get_functional_peak_regions_SG/dreme_down_DE_peaks")
+        "../output/get_functional_peak_regions_SG/dreme_up_DE_peaks", 
+        "../output/get_functional_peak_regions_SG/dreme_down_DE_peaks"
     output:
     shell:
         """
@@ -218,6 +215,7 @@ rule check_core_motif_ACGTG:
             python3 count_motifs.py --motif ACGTG --fasta {input[1]} --out {output[1]}
             python3 count_motifs.py --motif ACGTG --fasta {input[2]} --out {output[2]}
         """
+
 rule check_core_motif_ACGTC: 
     input: 
         '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.fasta', 
@@ -288,8 +286,8 @@ rule dreme_nonfunctional_peak_regions:
 
 rule plot_dreme_nonfunctional_peak_logos: 
     input:
-        directory("../output/get_nonfunctional_peak_regions/dreme_150_top_nonfunctional_peaks"), 
-        directory("../output/get_nonfunctional_peak_regions/dreme_300_top_nonfunctional_peaks")
+        "../output/get_nonfunctional_peak_regions/dreme_150_top_nonfunctional_peaks", 
+        "../output/get_nonfunctional_peak_regions/dreme_300_top_nonfunctional_peaks"
     output:
     shell:
         """
@@ -308,6 +306,15 @@ rule tomtom_nonfunctional_peak_regions:
         """
         tomtom {input[0]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[0]}
         tomtom {input[1]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[1]}
+        """
+
+##### make supplementary tables #####
+rule make_supp_tab: 
+    input: 
+    output: 
+    shell: 
+        """
+        python make_supplementary_tab.py
         """
 
 ##### this is for all the analysis of the 5 cell types #####
@@ -340,11 +347,24 @@ rule plot_intersect_bound_5cts_genes:
         python3 plot_venn_diagrams_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]} --sc_type "5 CTs"
         """
 
-##### make supplementary tables #####
-rule make_supp_tab: 
+##### this is to include in both late and early genes from salivary gland ##### 
+rule find_bound_DE_genes_early_late_sg: 
     input: 
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
     output: 
+        directory("../output/find_bound_DE_genes_early_late_sg")
     shell: 
         """
-        python make_supplementary_tab.py
+        python3 find_bound_DE_genes.py --boundGenes {input[0]} --cts "Salivary Gland" --out {output[0]} --include_late_sg yes
+        """
+
+rule plot_intersect_bound_genes_early_late_sg: 
+    input: 
+        "../output/find_bound_DE_genes_early_late_sg",
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
+    output: 
+        directory("../output/bound_spcg_DE_venn_early_late_sg")
+    shell: 
+        """
+        python3 plot_venn_diagrams_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]} --sc_type "salivary gland"
         """
