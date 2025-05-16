@@ -71,7 +71,7 @@ for(tmp_seq in names(plot_df_list)) {
   ggsave(filename = file.path(output_path, paste0(tmp_seq, ".png")), plot = p, width = 4.5, height = 3)
 }
 
-tmp_seq = 'KACGTGK'
+tmp_seq = 'CCACGTM'
 plot_df = plot_df_list[[tmp_seq]]
 plot_df = plot_df[1:5, ]
 plot_df = plot_df[is.na(plot_df$Query_ID) == FALSE, ]

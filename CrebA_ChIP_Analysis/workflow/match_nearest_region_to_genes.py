@@ -18,6 +18,13 @@ max_length = args.maxLength
 narrow_peaks = pd.read_csv(os.path.join(bed_input), sep="\t", header=None)
 promoter_tss = pd.read_csv("../output/tss_table/tss_table.txt")
 
+# limit it to protein coding genes 
+protein_df = pd.read_csv("../input/protein_genes/FlyBase_IDs.txt", header=None)
+protein_genes = np.array(protein_df[0])
+
+promoter_tss = promoter_tss.loc[promoter_tss['gene_id'].isin(protein_genes), :]
+
+
 ###### create the nearest distance 
 narrow_peaks['nearest_fly_id_1'] = None 
 narrow_peaks['nearest_gene_1'] = None 
