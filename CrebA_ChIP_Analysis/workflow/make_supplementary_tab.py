@@ -52,7 +52,7 @@ ma_up_DE_genes_df = up_DE_genes_df.loc[up_DE_genes_df['MA_DE'] == True, :]
 MA_up_genes = np.unique(ma_up_DE_genes_df['genes'])
 
 # Concatenate multiple numpy arrays into one
-all_genes = np.concatenate((sc_down_genes, MA_down_genes, insitu_genes, sc_up_genes, MA_up_genes, bound_genes))
+all_genes = np.concatenate((sc_down_genes, MA_down_genes, insitu_genes, sc_up_genes, MA_up_genes, bound_genes, spcgs_genes))
 all_genes = np.unique(all_genes)
 
 SG_genes = pd.read_csv("../../analysis/results/v19/early_wt_gsea/Salivary Gland/markers_genes.csv", index_col = 0)
