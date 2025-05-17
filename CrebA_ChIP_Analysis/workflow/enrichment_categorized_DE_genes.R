@@ -2,6 +2,7 @@ library(enrichR)
 library(ggplot2)
 library(igraph)
 library(readxl)
+library(stringr)
 
 enrichR::setEnrichrSite('FlyEnrichr')
 
@@ -81,6 +82,16 @@ down_enriched_df = down_enriched_df[order(down_enriched_df$Adjusted.P.value), ]
 up_enriched_df = up_enriched_df[order(up_enriched_df$Adjusted.P.value), ]
 big_df = rbind(down_enriched_df[1:num_entry, ], up_enriched_df[1:num_entry, ])
 
+for(tmp_row in rownames(big_df)) {
+  tmp_term = big_df[tmp_row, 'Term']  
+  tmp_list = stringr::str_split(tmp_term, " ")[[1]]
+  if(length(tmp_list) >= 10) {
+    tmp_list = append(tmp_list, "\n", after = round(length(tmp_list)/2))
+    new_name = paste(unlist(tmp_list), collapse = " ")
+    big_df[tmp_row, 'Term'] = new_name
+  }
+}
+
 p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = type)) +
   geom_bar(stat="identity") +
   labs(
@@ -133,6 +144,16 @@ up_enriched_df$type = 'Repression'
 down_enriched_df = down_enriched_df[order(down_enriched_df$Adjusted.P.value), ]
 up_enriched_df = up_enriched_df[order(up_enriched_df$Adjusted.P.value), ]
 big_df = rbind(down_enriched_df[1:num_entry, ], up_enriched_df[1:num_entry, ])
+
+for(tmp_row in rownames(big_df)) {
+  tmp_term = big_df[tmp_row, 'Term']  
+  tmp_list = stringr::str_split(tmp_term, " ")[[1]]
+  if(length(tmp_list) >= 10) {
+    tmp_list = append(tmp_list, "\n", after = round(length(tmp_list)/2))
+    new_name = paste(unlist(tmp_list), collapse = " ")
+    big_df[tmp_row, 'Term'] = new_name
+  }
+}
 
 p <- ggplot(data = big_df, aes(y = reorder(Term, logpval), x = logpval, fill = type)) +
   geom_bar(stat="identity") +

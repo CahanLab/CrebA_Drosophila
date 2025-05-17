@@ -43,8 +43,8 @@ curate_plot_df <- function(tomtom_results) {
 }
 
 ##### process down regulated genes ######
-input_path = file.path("../output/get_functional_peak_regions_SG/tomtom_down_DE_peaks/")
-output_path = file.path(input_path, 'barplots')
+input_path = file.path("../output/get_functional_peak_regions_SG/tomtom_down_DE_peaks")
+output_path = file.path(paste0(input_path, '_barplots'))
 color_fill = c('#004d00', '#66c2a5')
 names(color_fill) = c('overexpressed in SG', 'expressed in SG')
 tomtom_results = read.csv(file.path(input_path, "tomtom.tsv"), sep = '\t')
