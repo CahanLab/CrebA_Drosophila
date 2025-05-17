@@ -21,7 +21,22 @@ rule targets:
         directory("../output/get_functional_peak_regions_SG/tomtom_down_DE_peaks"),
         directory("../output/get_functional_peak_regions_SG/tomtom_up_DE_peaks"), 
         directory('../output/get_functional_peak_regions_SG/dreme_up_DE_peaks/logo_seq'),
-        directory('../output/get_functional_peak_regions_SG/dreme_down_DE_peaks/logo_seq')
+        directory('../output/get_functional_peak_regions_SG/dreme_down_DE_peaks/logo_seq'), 
+        directory("../output/get_functional_peak_regions_SG/tomtom_down_DE_peaks_barplots"),
+        '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.bed', 
+        '../output/get_nonfunctional_peak_regions/300_top_nonfunctional_peaks.bed', 
+        '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.fasta', 
+        '../output/get_nonfunctional_peak_regions/300_top_nonfunctional_peaks.fasta', 
+        directory("../output/get_nonfunctional_peak_regions/dreme_150_top_nonfunctional_peaks"), 
+        directory("../output/get_nonfunctional_peak_regions/dreme_300_top_nonfunctional_peaks"), 
+        directory('../output/get_nonfunctional_peak_regions/dreme_150_top_nonfunctional_peaks_logo_seq'),
+        directory('../output/get_nonfunctional_peak_regions/dreme_300_top_nonfunctional_peaks_logo_seq'), 
+        "../output/supplementary_table/sg_creba_network.csv", 
+        directory("../output/ct_genes_comparison"), 
+        directory("../output/find_bound_5cts_DE_genes"), 
+        directory("../output/5cts_bound_venn_diagrams"), 
+        directory("../output/find_bound_DE_genes_early_late_sg"), 
+        directory("../output/bound_spcg_DE_venn_early_late_sg")
 
 ###### standard curation of the input ######
 # construct a conversion table between flybase id and gene name 
@@ -220,7 +235,7 @@ rule plot_TOMTOM_results:
     input: 
 
     output: 
-        directory("../output/get_functional_peak_regions_SG/tomtom_down_DE_peaks/barplots")
+        directory("../output/get_functional_peak_regions_SG/tomtom_down_DE_peaks_barplots")
     shell:
         """
         Rscript plot_TOMTOM_results.R
@@ -265,19 +280,10 @@ rule dreme_nonfunctional_peak_regions:
         directory("../output/get_nonfunctional_peak_regions/dreme_300_top_nonfunctional_peaks")
     shell: 
         """
+        mkdir -p {output[0]}
+        mkdir -p {output[1]}
         dreme -p {input[0]} -o {output[0]} 
         dreme -p {input[1]} -o {output[1]}
-        """
-
-rule plot_dreme_nonfunctional_peak_logos: 
-    input:
-        "../output/get_nonfunctional_peak_regions/dreme_150_top_nonfunctional_peaks", 
-        "../output/get_nonfunctional_peak_regions/dreme_300_top_nonfunctional_peaks"
-    output:
-    shell:
-        """
-        Rscript plot_DREME_logos.R {input[0]} {input[0]}/logo_seq
-        Rscript plot_DREME_logos.R {input[1]} {input[1]}/logo_seq
         """
 
 rule tomtom_nonfunctional_peak_regions: 
@@ -293,10 +299,24 @@ rule tomtom_nonfunctional_peak_regions:
         tomtom {input[1]} ../input/motif_databases.12.23/FLY/fly_factor_survey.meme -o {output[1]}
         """
 
+rule plot_dreme_nonfunctional_peak_logos: 
+    input:
+        "../output/get_nonfunctional_peak_regions/dreme_150_top_nonfunctional_peaks", 
+        "../output/get_nonfunctional_peak_regions/dreme_300_top_nonfunctional_peaks"
+    output:
+        directory('../output/get_nonfunctional_peak_regions/dreme_150_top_nonfunctional_peaks_logo_seq'),
+        directory('../output/get_nonfunctional_peak_regions/dreme_300_top_nonfunctional_peaks_logo_seq')
+    shell:
+        """
+        Rscript plot_DREME_logos.R {input[0]} {output[0]}
+        Rscript plot_DREME_logos.R {input[1]} {output[1]}
+        """
+
 ##### make supplementary tables #####
 rule make_supp_tab: 
     input: 
     output: 
+        "../output/supplementary_table/sg_creba_network.csv"
     shell: 
         """
         python make_supplementary_tab.py
@@ -306,6 +326,7 @@ rule make_supp_tab:
 rule plot_venn_5cts_DE_genes: 
     input: 
     output: 
+        directory("../output/ct_genes_comparison")
     shell: 
         """
         python3 plot_venn_DE_genes_diff_cts.py
@@ -331,7 +352,6 @@ rule plot_intersect_bound_5cts_genes:
         """
         python3 plot_venn_diagrams_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]} --sc_type "5 CTs"
         """
-
 ##### this is to include in both late and early genes from salivary gland ##### 
 rule find_bound_DE_genes_early_late_sg: 
     input: 
@@ -353,46 +373,3 @@ rule plot_intersect_bound_genes_early_late_sg:
         """
         python3 plot_venn_diagrams_bound_genes.py --DE_genes {input[0]} --bound_genes {input[1]} --out {output[0]} --sc_type "salivary gland"
         """
-
- 
-rule check_core_motif_ACGTG: 
-    input: 
-        '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.fasta', 
-        '../output/get_functional_peak_regions_SG/down_DE_peaks.fasta', 
-        '../output/get_functional_peak_regions_SG/up_DE_peaks.fasta', 
-
-    output: 
-        "../output/ACGTG_cores/150_top_nonfunctional_peaks.csv", 
-        "../output/ACGTG_cores/down_DE_peaks.csv",
-        "../output/ACGTG_cores/up_DE_peaks.csv", 
-    shell: 
-        """
-            python3 count_motifs.py --motif ACGTG --fasta {input[0]} --out {output[0]}
-            python3 count_motifs.py --motif ACGTG --fasta {input[1]} --out {output[1]}
-            python3 count_motifs.py --motif ACGTG --fasta {input[2]} --out {output[2]}
-        """
-
-rule check_core_motif_ACGTC: 
-    input: 
-        '../output/get_nonfunctional_peak_regions/150_top_nonfunctional_peaks.fasta', 
-        '../output/get_functional_peak_regions_SG/down_DE_peaks.fasta', 
-        '../output/get_functional_peak_regions_SG/up_DE_peaks.fasta', 
-
-    output: 
-        "../output/ACGTC_cores/150_top_nonfunctional_peaks.csv", 
-        "../output/ACGTC_cores/down_DE_peaks.csv",
-        "../output/ACGTC_cores/up_DE_peaks.csv", 
-    shell: 
-        """
-            python3 count_motifs.py --motif ACGTC --fasta {input[0]} --out {output[0]}
-            python3 count_motifs.py --motif ACGTC --fasta {input[1]} --out {output[1]}
-            python3 count_motifs.py --motif ACGTC --fasta {input[2]} --out {output[2]}
-        """
-
-rule process_motif_counts: 
-    input: 
-    output: 
-    shell: 
-        """
-        Rscript plot_motif_counts.R 
-        """  
