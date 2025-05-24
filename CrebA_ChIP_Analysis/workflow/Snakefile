@@ -4,8 +4,10 @@ rule targets:
         "../input/previous_CrebA_motifs/CrebAMotifs_meme.meme", 
         "../output/tss_table/promoter_regions.bed", 
         "../output/tss_table/tss_table.txt",
-        "../output/range_peak_regions/fkh_sage_intersect_untrimmed.narrowPeak", 
-        "../output/range_peak_regions/fkh_sage_intersect.narrowPeak", 
+        "../output/range_peak_regions/CrebA_oregon.narrowPeak", 
+        "../output/range_peak_regions/CrebA_fkh.narrowPeak",
+        "../output/range_peak_regions/CrebA_sage.narrowPeak",
+        "../output/range_peak_regions/fkh_sage_intersect.narrowPeak",
         "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv", 
         "../output/find_bound_SPCGs/spcg_match_1000.csv", 
         '../output/find_bound_SG_DE_genes/down_DE.csv',
@@ -19,7 +21,9 @@ rule targets:
         "../output/get_functional_peak_regions_SG/dreme_down_DE_peaks/dreme.txt", 
         "../output/get_functional_peak_regions_SG/dreme_up_DE_peaks/dreme.txt", 
         directory("../output/get_functional_peak_regions_SG/tomtom_down_DE_peaks"),
-        directory("../output/get_functional_peak_regions_SG/tomtom_up_DE_peaks"), 
+        directory("../output/get_functional_peak_regions_SG/tomtom_up_DE_peaks"),
+        directory('../output/get_functional_peak_regions_SG/streme_down_DE_peaks/'),
+        directory('../output/get_functional_peak_regions_SG/streme_up_DE_peaks/'),
         directory('../output/get_functional_peak_regions_SG/dreme_up_DE_peaks/logo_seq'),
         directory('../output/get_functional_peak_regions_SG/dreme_down_DE_peaks/logo_seq'), 
         directory("../output/get_functional_peak_regions_SG/tomtom_down_DE_peaks_barplots"),
@@ -75,27 +79,33 @@ rule get_promoter_regions:
 
 ##### trim peak regions to be 250 +/- around the peak and get the intersecting peaks ######
 # trim the peak regions to be 250 +/- around the peak 
+rule trim_range_peaks: 
+    input: 
+        "../input/GEO_processed/GSM4213092_oregon_CrebA_peaks.narrowPeak",
+        "../input/GEO_processed/GSM4213094_fkh_CrebA_peaks.narrowPeak",
+        "../input/GEO_processed/GSM4213096_sage_CrebA_peaks.narrowPeak"
+    output: 
+        "../output/range_peak_regions/CrebA_oregon.narrowPeak", 
+        "../output/range_peak_regions/CrebA_fkh.narrowPeak",
+        "../output/range_peak_regions/CrebA_sage.narrowPeak"
+    shell: 
+        """
+        mkdir -p ../output/range_peak_regions/
+        python trim_peaks_range.py --range 250 --bed {input[0]} --out {output[0]}
+        python trim_peaks_range.py --range 250 --bed {input[1]} --out {output[1]}
+        python trim_peaks_range.py --range 250 --bed {input[2]} --out {output[2]}
+        """
 
 # find sage intersecting fkh ChIP-seq 
 rule find_fkh_sage_intersect_peaks: 
     input: 
-        "../input/GEO_processed/GSM4213094_fkh_CrebA_peaks.narrowPeak",
-        "../input/GEO_processed/GSM4213096_sage_CrebA_peaks.narrowPeak"
-    output: 
-        "../output/range_peak_regions/fkh_sage_intersect_untrimmed.narrowPeak"
-    shell: 
-        """
-        bedtools intersect -a {input[1]} -b {input[0]} -f 0.25 -u -wa > {output}  
-        """
-
-rule trim_range_peaks: 
-    input: 
-        "../output/range_peak_regions/fkh_sage_intersect_untrimmed.narrowPeak"
+        "../output/range_peak_regions/CrebA_fkh.narrowPeak", 
+        "../output/range_peak_regions/CrebA_sage.narrowPeak"
     output: 
         "../output/range_peak_regions/fkh_sage_intersect.narrowPeak"
     shell: 
         """
-        python trim_peaks_range.py --range 250 --bed {input[0]} --out {output[0]}
+        bedtools intersect -a {input[1]} -b {input[0]} -f 0.5 -u -wa > {output}  
         """
 
 ##### match the peaks to a gene ######
@@ -109,7 +119,7 @@ rule match_peak_gene:
     shell: 
         """
         mkdir -p ../output/match_nearest_gene
-        python3 match_nearest_region_to_genes.py --bed {input[0]} --maxLength 1500 --out {output[0]}
+        python3 match_nearest_region_to_genes.py --bed {input[0]} --maxLength 1000 --out {output[0]}
         """
 
 # find the SPCGs that are bound by CrebA 
@@ -190,6 +200,19 @@ rule get_functional_SG_peak_regions_fasta:
         bedtools getfasta -fi ../input/reference_genome/dmel-all-chromosome-r6.33.fasta -bed {input[1]} -nameOnly > {output[1]}
         """
 
+rule streme_functional_peak_regions:
+    input: 
+        '../output/get_functional_peak_regions_SG/down_DE_peaks.fasta',
+        '../output/get_functional_peak_regions_SG/up_DE_peaks.fasta'
+    output: 
+        directory('../output/get_functional_peak_regions_SG/streme_down_DE_peaks/'),
+        directory('../output/get_functional_peak_regions_SG/streme_up_DE_peaks/')
+    shell:
+        """
+        streme -p {input[0]} -oc {output[0]} --minw	3 --maxw 7
+        streme -p {input[1]} -oc {output[1]} --minw 3 --maxw 7
+        """
+
 rule dreme_functional_peak_regions:
     input: 
         '../output/get_functional_peak_regions_SG/down_DE_peaks.fasta',
@@ -233,7 +256,7 @@ rule plot_dreme_functional_peak_logos:
 
 rule plot_TOMTOM_results: 
     input: 
-
+        directory("../output/get_functional_peak_regions_SG/tomtom_down_DE_peaks")
     output: 
         directory("../output/get_functional_peak_regions_SG/tomtom_down_DE_peaks_barplots")
     shell:
@@ -280,8 +303,6 @@ rule dreme_nonfunctional_peak_regions:
         directory("../output/get_nonfunctional_peak_regions/dreme_300_top_nonfunctional_peaks")
     shell: 
         """
-        mkdir -p {output[0]}
-        mkdir -p {output[1]}
         dreme -p {input[0]} -o {output[0]} 
         dreme -p {input[1]} -o {output[1]}
         """
@@ -315,6 +336,8 @@ rule plot_dreme_nonfunctional_peak_logos:
 ##### make supplementary tables #####
 rule make_supp_tab: 
     input: 
+        directory("../output/find_bound_SG_DE_genes"),
+        "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv"
     output: 
         "../output/supplementary_table/sg_creba_network.csv"
     shell: 

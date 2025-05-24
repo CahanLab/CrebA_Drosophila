@@ -20,12 +20,14 @@ crebA_bound_df = pd.read_csv(bound_genes_path, index_col = 0)
 concatenated_array = np.concatenate((np.array(crebA_bound_df['nearest_gene_1'].dropna()), np.array(crebA_bound_df['nearest_gene_2'].dropna())))
 concatenated_array = np.unique(concatenated_array)
 concatenated_array = list(concatenated_array)
+
 for element in concatenated_array:
     # Split the string by whitespace
     split_elements = element.split(",")
     if len(split_elements) > 1:
         concatenated_array.extend(split_elements)
-        concatenated_array.remove(element)
+        
+concatenated_array = [x for x in concatenated_array if "," not in x] 
 bound_genes = np.unique(concatenated_array)
 
 # look at the all the other genes 

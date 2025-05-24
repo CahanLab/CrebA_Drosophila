@@ -84,7 +84,8 @@ for element in concatenated_array:
     split_elements = element.split(",")
     if len(split_elements) > 1:
         concatenated_array.extend(split_elements)
-        concatenated_array.remove(element)
+        
+concatenated_array = [x for x in concatenated_array if "," not in x] 
 bound_genes = np.unique(concatenated_array)
 
 ###### there are to make plots #######
