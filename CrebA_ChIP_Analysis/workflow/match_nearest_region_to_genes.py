@@ -7,11 +7,13 @@ parser = argparse.ArgumentParser(description='match genes to nearest gene')
 parser.add_argument('--bed', type=str, help = 'the path for the bed files')
 parser.add_argument('--maxLength', type = int, help = 'maximum distance for matching nearest gene')
 parser.add_argument('--out', type=str, help = 'the output path')
+parser.add_argument('--restriction', type=str, help = 'restriction on the genes', default='protein_only')
 args = parser.parse_args()
 
 bed_input = args.bed 
 bed_output = args.out
 max_length = args.maxLength
+restriction = args.restriction
 
 ##### load in the required data 
 # look at the intersecting peaks 500bp limited 
@@ -19,10 +21,10 @@ narrow_peaks = pd.read_csv(os.path.join(bed_input), sep="\t", header=None)
 promoter_tss = pd.read_csv("../output/tss_table/tss_table.txt")
 
 # limit it to protein coding genes 
-protein_df = pd.read_csv("../input/protein_genes/FlyBase_IDs.txt", header=None)
-protein_genes = np.array(protein_df[0])
-
-promoter_tss = promoter_tss.loc[promoter_tss['gene_id'].isin(protein_genes), :]
+if restriction == 'protein_only':
+    protein_df = pd.read_csv("../input/protein_genes/FlyBase_IDs.txt", header=None)
+    protein_genes = np.array(protein_df[0])
+    promoter_tss = promoter_tss.loc[promoter_tss['gene_id'].isin(protein_genes), :]
 
 
 ###### create the nearest distance 
