@@ -88,3 +88,23 @@ supp_tab['repressed_genes'] = supp_tab['genes'].isin(repressed_genes)
 os.makedirs("../output/supplementary_table", exist_ok=True)
 supp_tab.to_csv("../output/supplementary_table/sg_creba_network.csv")
 
+##### make the better creba network without too many unnecessary information #####
+
+activated_genes = np.unique(list(sc_down_genes) + list(insitu_genes) + list(MA_SG))
+activated_genes = np.intersect1d(activated_genes, bound_genes)
+
+# get the repressed genes 
+repressed_genes = np.unique(sc_up_genes)
+repressed_genes = np.intersect1d(repressed_genes, bound_genes)
+
+direct_regulons = np.concatenate((activated_genes, repressed_genes))
+
+direct_network = pd.DataFrame(direct_regulons, columns = ['genes'])
+direct_network['type'] = None 
+direct_network.loc[direct_network['genes'].isin(activated_genes), 'type'] = 'activation'
+direct_network.loc[direct_network['genes'].isin(repressed_genes), 'type'] = 'repression'
+direct_network['is_spcg'] = None 
+direct_network.loc[direct_network['genes'].isin(spcgs_genes), 'is_spcg'] = 'spcg'
+direct_network.loc[direct_network['genes'].isin(spcgs_genes) == False, 'is_spcg'] = 'not spcg'
+
+direct_network.to_csv("../output/supplementary_table/direct_network.csv", index=False)
