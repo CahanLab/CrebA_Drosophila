@@ -2,6 +2,15 @@ TARGET_dir = file.path("results", ANALYSIS_VERSION, "SuppTabs")
 
 ##### make the cluster DE genes #####
 DE_tab = read.csv(file.path("results", ANALYSIS_VERSION, "crebA_early_integrated/marker_genes.csv"), row.names = 1)
+manual_annotations = read.csv("accessory_data/manual_annotation/v19/crebA_early/manual_annotations.csv")
+rownames(manual_annotations) = manual_annotations$Cluster_id
+excel_list = list()
+DE_tab$celltype_annotation = NULL
+
+for(tmp_cluster in rownames(manual_annotations)) {
+  DE_tab[DE_tab$cluster == tmp_cluster, 'celltype_annotation'] = manual_annotations[tmp_cluster, 'Manual_Annotation']
+}
+
 write.csv(DE_tab, file.path(TARGET_dir, 'early_CrebA_marker_genes.csv'))
 
 # most likely not going to be used in the main analysis 
