@@ -70,6 +70,9 @@ plot_df$celltype = factor(plot_df$celltype, levels = sub_exp_order$id)
 plot_df$spcg_cat = factor(plot_df$spcg_cat, levels = c("CrebA", unique(spcg_tab$`SPCG General Functional Categories`)[unique(spcg_tab$`SPCG General Functional Categories`) != 'CrebA']))
 plot_df = plot_df[plot_df$spcg_cat != 'Prolyl hydroxylation', ]
 
+# order the genes 
+sg_exp_order = exp_order[exp_order$id == 'Salivary Gland', ]
+plot_df$feature = factor(plot_df$feature, levels = sg_exp_order$features.plot)
 write.csv(plot_df, file = file.path(TARGET_dir, 'stage10-12_logFC.csv'))
 
 p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', fill = 'logFC')) +

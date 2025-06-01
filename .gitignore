@@ -35,6 +35,7 @@ analysis/.Rprofile
 CrebA_ChIP_Analysis/input/*
 CrebA_ChIP_Analysis/output/*
 CrebA_ChIP_Analysis/workflow/.snakemake/*
+CrebA_ChIP_Analysis/find_diff.py
 
 CrebA_ChIP_Analysis/output_old/*
 CrebA_ChIP_Analysis/output_old2/*

@@ -4,9 +4,8 @@ rule targets:
         "../input/previous_CrebA_motifs/CrebAMotifs_meme.meme", 
         "../output/tss_table/promoter_regions.bed", 
         "../output/tss_table/tss_table.txt",
-        "../output/range_peak_regions/CrebA_oregon.narrowPeak", 
-        "../output/range_peak_regions/CrebA_fkh.narrowPeak",
-        "../output/range_peak_regions/CrebA_sage.narrowPeak",
+        "../output/range_peak_regions/fkh_sage_intersect_raw.narrowPeak",
+        "../output/range_peak_regions/fkh_sage_intersect_untrimmed.narrowPeak",
         "../output/range_peak_regions/fkh_sage_intersect.narrowPeak",
         "../output/match_nearest_gene/fkh_sage_intersect_genes_1000.csv", 
         "../output/find_bound_SPCGs/spcg_match_1000.csv", 
@@ -78,34 +77,29 @@ rule get_promoter_regions:
         "python3 get_promoter.py"
 
 ##### trim peak regions to be 250 +/- around the peak and get the intersecting peaks ######
-# trim the peak regions to be 250 +/- around the peak 
-rule trim_range_peaks: 
-    input: 
-        "../input/GEO_processed/GSM4213092_oregon_CrebA_peaks.narrowPeak",
-        "../input/GEO_processed/GSM4213094_fkh_CrebA_peaks.narrowPeak",
-        "../input/GEO_processed/GSM4213096_sage_CrebA_peaks.narrowPeak"
-    output: 
-        "../output/range_peak_regions/CrebA_oregon.narrowPeak", 
-        "../output/range_peak_regions/CrebA_fkh.narrowPeak",
-        "../output/range_peak_regions/CrebA_sage.narrowPeak"
-    shell: 
-        """
-        mkdir -p ../output/range_peak_regions/
-        python trim_peaks_range.py --range 250 --bed {input[0]} --out {output[0]}
-        python trim_peaks_range.py --range 250 --bed {input[1]} --out {output[1]}
-        python trim_peaks_range.py --range 250 --bed {input[2]} --out {output[2]}
-        """
 
 # find sage intersecting fkh ChIP-seq 
 rule find_fkh_sage_intersect_peaks: 
     input: 
-        "../output/range_peak_regions/CrebA_fkh.narrowPeak", 
-        "../output/range_peak_regions/CrebA_sage.narrowPeak"
+       "../input/GEO_processed/GSM4213094_fkh_CrebA_peaks.narrowPeak",
+        "../input/GEO_processed/GSM4213096_sage_CrebA_peaks.narrowPeak"
     output: 
+        "../output/range_peak_regions/fkh_sage_intersect_raw.narrowPeak"
+    shell: 
+        """
+        bedtools intersect -a {input[1]} -b {input[0]} -u > {output}  
+        """
+
+rule reformat_intersect_peaks: 
+    input: 
+        "../output/range_peak_regions/fkh_sage_intersect_raw.narrowPeak"
+    output: 
+        "../output/range_peak_regions/fkh_sage_intersect_untrimmed.narrowPeak",
         "../output/range_peak_regions/fkh_sage_intersect.narrowPeak"
     shell: 
         """
-        bedtools intersect -a {input[1]} -b {input[0]} -f 0.5 -u -wa > {output}  
+        python reformat_intersect_peaks.py --bed {input[0]} --out {output[0]}
+        python trim_peaks_range.py --range 250 --bed {output[0]} --out {output[1]} 
         """
 
 ##### match the peaks to a gene ######
@@ -209,8 +203,8 @@ rule streme_functional_peak_regions:
         directory('../output/get_functional_peak_regions_SG/streme_up_DE_peaks/')
     shell:
         """
-        streme -p {input[0]} -oc {output[0]} --minw	3 --maxw 7
-        streme -p {input[1]} -oc {output[1]} --minw 3 --maxw 7
+        streme -p {input[0]} -oc {output[0]} --minw	3 --maxw 6
+        streme -p {input[1]} -oc {output[1]} --minw 3 --maxw 6
         """
 
 rule dreme_functional_peak_regions:
