@@ -1,4 +1,19 @@
 TARGET_dir = file.path("results", ANALYSIS_VERSION, "SuppTabs")
+dir.create(TARGET_dir)
+
+##### make the seurat rds for upload on GEO #####
+# early data 
+seurat_obj = readRDS(file.path("results", ANALYSIS_VERSION, 'manual_annotation_crebA_early/manual_celltype_object.rds'))
+seurat_obj@meta.data$celltype_annotations = seurat_obj@meta.data$manual_celltypes
+seurat_obj@meta.data$manual_celltypes = NULL
+seurat_obj@meta.data$Integrated_tentativeCellType = NULL
+saveRDS(seurat_obj, file = file.path(TARGET_dir, 'early_CrebA_seurat_object.rds'))
+
+seurat_obj = readRDS(file.path("results", ANALYSIS_VERSION, 'manual_annotation_crebA/manual_celltype_object.rds'))
+seurat_obj@meta.data$celltype_annotations = seurat_obj@meta.data$manual_celltypes
+seurat_obj@meta.data$manual_celltypes = NULL
+seurat_obj@meta.data$tentativeCellType = NULL
+saveRDS(seurat_obj, file = file.path(TARGET_dir, 'late_CrebA_seurat_object.rds'))
 
 ##### make the cluster DE genes #####
 DE_tab = read.csv(file.path("results", ANALYSIS_VERSION, "crebA_early_integrated/marker_genes.csv"), row.names = 1)
@@ -47,8 +62,8 @@ excel_list = list()
 for(tmp_ct in list.files(input_path)) {
   tmp_df = read.csv(file.path(input_path, tmp_ct, "mut_gsea_results.csv"), row.names = 1)
   tmp_df = tmp_df[tmp_df$NES > 0, ]
-  tmp_df = tmp_df[order(tmp_df$padj), ]
-  excel_list[[tmp_ct]] = tmp_DE
+  tmp_df = tmp_df[order(tmp_df$NES, decreasing = TRUE), ]
+  excel_list[[tmp_ct]] = tmp_df
 }
 openxlsx::write.xlsx(excel_list, file = file.path(TARGET_dir, "mut_GSEA_early_CrebA_wt.xlsx"))
 
@@ -59,7 +74,7 @@ excel_list = list()
 for(tmp_ct in list.files(input_path)) {
   tmp_df = read.csv(file.path(input_path, tmp_ct, "wt_gsea_results.csv"), row.names = 1)
   tmp_df = tmp_df[tmp_df$NES > 0, ]
-  tmp_df = tmp_df[order(tmp_df$padj), ]
-  excel_list[[tmp_ct]] = tmp_DE
+  tmp_df = tmp_df[order(tmp_df$NES, decreasing = TRUE), ]
+  excel_list[[tmp_ct]] = tmp_df
 }
 openxlsx::write.xlsx(excel_list, file = file.path(TARGET_dir, "wt_GSEA_early_CrebA_wt.xlsx"))

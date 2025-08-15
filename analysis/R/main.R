@@ -107,6 +107,9 @@ if(dir.exists(file.path("results", ANALYSIS_VERSION, 'SuppTabs')) == FALSE) {
 # make supplementary tables 
 source("R/make_supplementary_tables.R")
 
+###### reviewer comments ###### 
+source("R/check_depth.R")
+
 ###### unused scripts ######
 
 # here are the scripts that did not make it to the main analysis 
