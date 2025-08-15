@@ -73,9 +73,9 @@ up_enriched_df = enriched$GO_Biological_Process_2018
 write.csv(up_enriched_df, file = file.path(TARGET_dir, 'up_genes_enrichment.csv'))
 
 ##### look at the up and down genes #####
-down_enriched_df$logpval = -log(down_enriched_df$Adjusted.P.value)
+down_enriched_df$logpval = -log10(down_enriched_df$Adjusted.P.value)
 down_enriched_df$type = 'Activation'
-up_enriched_df$logpval = -log(up_enriched_df$Adjusted.P.value)
+up_enriched_df$logpval = -log10(up_enriched_df$Adjusted.P.value)
 up_enriched_df$type = 'Repression'
 
 down_enriched_df = down_enriched_df[order(down_enriched_df$Adjusted.P.value), ]
@@ -136,9 +136,9 @@ up_enriched_df = enriched$GO_Biological_Process_2018
 write.csv(up_enriched_df, file = file.path(TARGET_dir, 'up_genes_no_spcg_enrichment.csv'))
 
 ##### look at the up and down genes #####
-down_enriched_df$logpval = -log(down_enriched_df$Adjusted.P.value)
+down_enriched_df$logpval = -log10(down_enriched_df$Adjusted.P.value)
 down_enriched_df$type = 'Activation'
-up_enriched_df$logpval = -log(up_enriched_df$Adjusted.P.value)
+up_enriched_df$logpval = -log10(up_enriched_df$Adjusted.P.value)
 up_enriched_df$type = 'Repression'
 
 down_enriched_df = down_enriched_df[order(down_enriched_df$Adjusted.P.value), ]
