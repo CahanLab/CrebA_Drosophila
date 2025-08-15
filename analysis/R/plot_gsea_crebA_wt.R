@@ -18,8 +18,8 @@ get_top_cat <- function(ct, top_num = 5) {
   wt_gsea$type = 'wildtype'
   mut_gsea$type = 'mutant'
   
-  wt_gsea$logpval = -log(wt_gsea$padj)
-  mut_gsea$logpval = -log(wt_gsea$padj)
+  wt_gsea$logpval = -log10(wt_gsea$padj)
+  mut_gsea$logpval = -log10(wt_gsea$padj)
   return(rbind(wt_gsea, mut_gsea))
 }
 
