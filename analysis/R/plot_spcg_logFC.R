@@ -152,6 +152,19 @@ p <- ggplot(data = plot_df, mapping = aes_string(y = 'celltype', x = 'feature', 
   ggtitle("Stage 10-12 Embryos")
 ggsave(filename = file.path(TARGET_dir, "stage10-12_logFC_purple_yellow.png"), plot = p, width = 32, height = 7)
 
+##### plot out the SPCG as box plot ######
+color_palette = readRDS(file.path("results", ANALYSIS_VERSION, "ct_color_palettes", 'ct_color_palette.rds'))
+spcg_plot_df = plot_df[plot_df$spcg_cat != 'CrebA', ]
+spcg_plot_df$celltype = factor(spcg_plot_df$celltype, levels = rev(sub_exp_order$id))
+
+p = ggplot(spcg_plot_df, aes(x = celltype, y = logFC, fill = celltype)) + 
+  geom_boxplot() + 
+  scale_fill_manual(values = color_palette, name = 'Cell Types') +
+  theme_cowplot() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ylab('logFC of SPCGs') + 
+  xlab('Cell Types')
+ggsave(filename = file.path(TARGET_dir, 'stage10-12_logFC_boxplot.png'), plot = p, width = 12, height = 7)
 
 ##### load and compile the late data #####
 plot_df = data.frame()

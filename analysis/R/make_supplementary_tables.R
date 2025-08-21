@@ -13,6 +13,9 @@ seurat_obj = readRDS(file.path("results", ANALYSIS_VERSION, 'manual_annotation_c
 seurat_obj@meta.data$celltype_annotations = seurat_obj@meta.data$manual_celltypes
 seurat_obj@meta.data$manual_celltypes = NULL
 seurat_obj@meta.data$tentativeCellType = NULL
+seurat_obj@meta.data$DoubletFinder_score = NULL
+seurat_obj@meta.data$DoubletFinder_call = NULL
+seurat_obj@meta.data$RNA_snn_res.0.8 = NULL
 saveRDS(seurat_obj, file = file.path(TARGET_dir, 'late_CrebA_seurat_object.rds'))
 
 ##### make the cluster DE genes #####

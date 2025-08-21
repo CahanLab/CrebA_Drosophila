@@ -16,6 +16,8 @@ metadata = read.table(header = T, text=
    crebA_rep4 2023-04-05_scRNA_10x_3prime_CrebA_late4
    crebA_rep5 2023-06-20_scRNA_10x_3prime_CrebA_late5")
 
+# crebA_rep3 was ultimately the one that was used for late 
+
 SAMPLE = "all"
 source("R/set_up_environment.R")
 
