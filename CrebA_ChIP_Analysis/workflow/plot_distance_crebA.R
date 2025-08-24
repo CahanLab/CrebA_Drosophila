@@ -74,10 +74,10 @@ if(is.na(include_MA) == TRUE) {
     i_genes = intersect(down_DE$genes, up_DE$genes)
     down_DE = down_DE[down_DE$genes %in% i_genes == FALSE, ]
   } else if(include_MA == "MA_SG") {
-    SG_genes = read.csv("../../analysis/results/v19/early_wt_gsea/Salivary Gland/markers_genes.csv", row.names = 1)
+    SG_genes = read.csv("../input/early_sg_DE_genes/markers_genes_early_SG.csv", row.names = 1)
     SG_genes = SG_genes[SG_genes$pct.1 >= 0.1, ]
       
-    mut_diff_genes = read.csv("../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", row.names = 1)
+    mut_diff_genes = read.csv("../input/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", row.names = 1)
     mut_diff_genes = mut_diff_genes[mut_diff_genes$logFC < 0, ]
     MA_select_genes = intersect(rownames(SG_genes), mut_diff_genes$feature)
 

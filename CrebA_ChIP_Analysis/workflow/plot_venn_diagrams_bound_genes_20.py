@@ -166,10 +166,10 @@ plt.savefig(os.path.join(output_path, 'ma_up-sc_up-SPCGs.png'), dpi=300, bbox_in
 plt.clf()
 
 ###### this is the additional analysis to include genes that exist in MA but also expressed in SG #######
-SG_genes = pd.read_csv("../../analysis/results/v19/early_wt_gsea/Salivary Gland/markers_genes.csv", index_col = 0)
+SG_genes = pd.read_csv("../input/early_sg_DE_genes/markers_genes_early_SG.csv", index_col = 0)
 SG_genes = SG_genes.loc[SG_genes['pct.1'] >= 0.2, :]
 
-mut_diff_genes = pd.read_csv("../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", index_col = 0)
+mut_diff_genes = pd.read_csv("../input/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", index_col = 0)
 mut_diff_genes = mut_diff_genes.loc[mut_diff_genes['logFC'] < 0, :]
 
 MA_SG = np.intersect1d(MA_down_genes, SG_genes.index)
