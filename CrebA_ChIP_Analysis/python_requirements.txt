@@ -1,0 +1,112 @@
+appdirs==1.4.4
+appnope @ file:///home/conda/feedstock_root/build_artifacts/appnope_1649077682618/work
+argparse-dataclass==2.0.0
+asttokens @ file:///home/conda/feedstock_root/build_artifacts/asttokens_1698341106958/work
+attrs==23.2.0
+certifi @ file:///home/conda/feedstock_root/build_artifacts/certifi_1707022139797/work/certifi
+charset-normalizer==3.3.2
+colorspacious==1.1.2
+colour==0.1.5
+comm @ file:///home/conda/feedstock_root/build_artifacts/comm_1691044910542/work
+conda-inject==1.3.2
+ConfigArgParse==1.7
+connection-pool==0.0.3
+contourpy @ file:///Users/runner/miniforge3/conda-bld/contourpy_1699041423031/work
+cycler @ file:///home/conda/feedstock_root/build_artifacts/cycler_1696677705766/work
+datrie==0.8.2
+debugpy @ file:///Users/runner/miniforge3/conda-bld/debugpy_1695534617894/work
+decorator @ file:///home/conda/feedstock_root/build_artifacts/decorator_1641555617451/work
+docutils==0.21.2
+dpath==2.1.6
+dtreeviz==2.2.2
+et-xmlfile @ file:///home/conda/feedstock_root/build_artifacts/et_xmlfile_1674664118162/work
+exceptiongroup @ file:///home/conda/feedstock_root/build_artifacts/exceptiongroup_1700579780973/work
+executing @ file:///home/conda/feedstock_root/build_artifacts/executing_1698579936712/work
+fastjsonschema==2.19.1
+fonttools @ file:///Users/runner/miniforge3/conda-bld/fonttools_1701530727288/work
+gitdb==4.0.11
+GitPython==3.1.43
+glasbey==0.2.0
+graphviz==0.20.1
+humanfriendly==10.0
+idna==3.7
+immutables==0.20
+importlib-metadata @ file:///home/conda/feedstock_root/build_artifacts/importlib-metadata_1701632192416/work
+iniconfig==2.0.0
+ipykernel @ file:///Users/runner/miniforge3/conda-bld/ipykernel_1698244280508/work
+ipython @ file:///home/conda/feedstock_root/build_artifacts/ipython_1701831663892/work
+jedi @ file:///home/conda/feedstock_root/build_artifacts/jedi_1696326070614/work
+Jinja2==3.1.4
+joblib==1.3.2
+jsonschema==4.22.0
+jsonschema-specifications==2023.12.1
+jupyter_client @ file:///home/conda/feedstock_root/build_artifacts/jupyter_client_1699283905679/work
+jupyter_core @ file:///Users/runner/miniforge3/conda-bld/jupyter_core_1698673707370/work
+kiwisolver @ file:///Users/runner/miniforge3/conda-bld/kiwisolver_1695380047486/work
+llvmlite==0.42.0
+MarkupSafe==2.1.5
+matplotlib @ file:///Users/runner/miniforge3/conda-bld/matplotlib-suite_1700509648912/work
+matplotlib-inline @ file:///home/conda/feedstock_root/build_artifacts/matplotlib-inline_1660814786464/work
+matplotlib-venn==0.11.10
+mizani==0.11.4
+nbformat==5.10.4
+nest-asyncio @ file:///home/conda/feedstock_root/build_artifacts/nest-asyncio_1697083700168/work
+numba==0.59.1
+numpy @ file:///Users/runner/miniforge3/conda-bld/numpy_1700874567832/work/dist/numpy-1.26.2-cp312-cp312-macosx_10_9_x86_64.whl#sha256=77d5769364f161b525bb34fa051bfedec44a3a9153f29e9a7d49a99542fb131c
+openpyxl @ file:///Users/runner/miniforge3/conda-bld/openpyxl_1695464764148/work
+packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1696202382185/work
+pandas @ file:///Users/runner/miniforge3/conda-bld/pandas_1699670381716/work
+parso @ file:///home/conda/feedstock_root/build_artifacts/parso_1638334955874/work
+patsy @ file:///home/conda/feedstock_root/build_artifacts/patsy_1701443970942/work
+pexpect @ file:///home/conda/feedstock_root/build_artifacts/pexpect_1667297516076/work
+pickleshare @ file:///home/conda/feedstock_root/build_artifacts/pickleshare_1602536217715/work
+Pillow @ file:///Users/runner/miniforge3/conda-bld/pillow_1697423673228/work
+plac==1.4.3
+platformdirs @ file:///home/conda/feedstock_root/build_artifacts/platformdirs_1701708255999/work
+plotnine==0.13.6
+pluggy==1.3.0
+prompt-toolkit @ file:///home/conda/feedstock_root/build_artifacts/prompt-toolkit_1699963054032/work
+psutil @ file:///Users/runner/miniforge3/conda-bld/psutil_1695367146253/work
+ptyprocess @ file:///home/conda/feedstock_root/build_artifacts/ptyprocess_1609419310487/work/dist/ptyprocess-0.7.0-py2.py3-none-any.whl
+PuLP==2.8.0
+pure-eval @ file:///home/conda/feedstock_root/build_artifacts/pure_eval_1642875951954/work
+Pygments @ file:///home/conda/feedstock_root/build_artifacts/pygments_1700607939962/work
+pyparsing @ file:///home/conda/feedstock_root/build_artifacts/pyparsing_1690737849915/work
+pytest==7.4.3
+python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/python-dateutil_1626286286081/work
+pytz @ file:///home/conda/feedstock_root/build_artifacts/pytz_1693930252784/work
+PyYAML==6.0.1
+pyzmq @ file:///Users/runner/miniforge3/conda-bld/pyzmq_1701783244552/work
+referencing==0.35.1
+requests==2.32.3
+reretry==0.11.8
+rpds-py==0.18.1
+scikit-learn==1.3.2
+SciPy @ file:///Users/runner/miniforge3/conda-bld/scipy-split_1700812573211/work/dist/scipy-1.11.4-cp312-cp312-macosx_10_9_x86_64.whl#sha256=bff87204e50766286e497874aa7e28f851a935a5745b1b166e355bf328c5f721
+setuptools==68.2.2
+six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
+smart-open==7.0.4
+smmap==5.0.1
+snakemake @ git+https://github.com/snakemake/snakemake@0fe0459107db0cd426093eedd7a01410a86839af
+snakemake-interface-common==1.17.2
+snakemake-interface-executor-plugins==9.1.1
+snakemake-interface-report-plugins==1.0.0
+snakemake-interface-storage-plugins==3.2.2
+stack-data @ file:///home/conda/feedstock_root/build_artifacts/stack_data_1669632077133/work
+statsmodels @ file:///Users/runner/miniforge3/conda-bld/statsmodels_1696548134127/work
+stopit==1.1.2
+tabulate==0.9.0
+threadpoolctl==3.2.0
+throttler==1.2.2
+toposort==1.10
+tornado @ file:///Users/runner/miniforge3/conda-bld/tornado_1695373467875/work
+traitlets @ file:///home/conda/feedstock_root/build_artifacts/traitlets_1701095650114/work
+typing_extensions @ file:///home/conda/feedstock_root/build_artifacts/typing_extensions_1695040754690/work
+tzdata @ file:///home/conda/feedstock_root/build_artifacts/python-tzdata_1680081134351/work
+urllib3==2.2.1
+wcwidth @ file:///home/conda/feedstock_root/build_artifacts/wcwidth_1700607916581/work
+wheel==0.42.0
+wrapt==1.16.0
+xgboost==2.0.2
+yte==1.5.4
+zipp @ file:///home/conda/feedstock_root/build_artifacts/zipp_1695255097490/work
