@@ -1,8 +1,8 @@
 ### Analysis for scRNA-seq
 
-- Current code: main.R calls our current analysis scripts in the correct order. You can find all the R scripts in R/ folder.
+- Current code: *main.R* calls our current analysis scripts in the correct order. You can find all the R scripts in `R/` folder.
 
-Here are the softwares used for the main analysis. 
+Here are the packages required for the main analysis. 
 
 | Package     | Version     |
 | ----------- | ----------- |
