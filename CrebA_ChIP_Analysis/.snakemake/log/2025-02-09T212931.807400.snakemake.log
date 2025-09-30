@@ -1,8 +1,0 @@
-Building DAG of jobs...
-MissingInputException in rule trim_range_peaks in file /Users/danny/CahanLab Dropbox/Dan Peng/salivary_gland_CrebA/CrebA_ChIP_Analysis/workflow/Snakefile, line 38:
-Missing input files for rule trim_range_peaks:
-    output: ../output/range_peak_regions/CrebA_oregon.narrowPeak, ../output/range_peak_regions/CrebA_fkh.narrowPeak, ../output/range_peak_regions/CrebA_sage.narrowPeak
-    affected files:
-        ../input/GEO_processed/GSM4213094_fkh_CrebA_peaks.narrowPeak
-        ../input/GEO_processed/GSM4213092_oregon_CrebA_peaks.narrowPeak
-        ../input/GEO_processed/GSM4213096_sage_CrebA_peaks.narrowPeak

@@ -25,7 +25,7 @@ MA_counter_file = args.MA_counter_file
 bed_file = pd.read_csv(bed_input, index_col=0)
 bed_file = bed_file.loc[np.logical_and(bed_file['nearest_fly_id_1'].isna(), bed_file['nearest_fly_id_2'].isna()) == False, :]
 
-SG_de_genes = pd.read_csv("../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", index_col = 0)
+SG_de_genes = pd.read_csv("../input/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", index_col = 0)
 
 def check_intersect_genes(bed_file, gene_list):
     output_array = []
@@ -58,10 +58,10 @@ elif spcg_input == '' and DE_genes != "":
             i_genes = np.intersect1d(counter_DE_genes_df['genes'], DE_genes_df['genes'])
             DE_genes_df = DE_genes_df.loc[DE_genes_df['genes'].isin(i_genes) == False, :]
         elif MA_include == 'MA_SG':
-            SG_genes = pd.read_csv("../../analysis/results/v19/early_wt_gsea/Salivary Gland/markers_genes.csv", index_col = 0)
+            SG_genes = pd.read_csv("../input/early_sg_DE_genes/markers_genes_early_SG.csv", index_col = 0)
             SG_genes = SG_genes.loc[SG_genes['pct.1'] >= 0.1, :]
             
-            mut_diff_genes = pd.read_csv("../../analysis/results/v19/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", index_col = 0)
+            mut_diff_genes = pd.read_csv("../input/DE_genes_early_crebA_wt/Salivary Gland/mut_DE_genes.csv", index_col = 0)
             mut_diff_genes = mut_diff_genes.loc[mut_diff_genes['logFC'] < 0, :]
 
             MA_SG = np.intersect1d(SG_genes.index, mut_diff_genes['feature'])

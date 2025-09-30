@@ -8,13 +8,11 @@ renv::activate()
 ANALYSIS_VERSION = "v19" # Where to put output
 metadata = read.table(header = T, text=
   "sample cellranger
-   crebA_rep1 2022-12-07_scRNA_10x_3prime_CrebA2
    crebA_early_rep1 2022-12-07_scRNA_10x_3prime_CrebA
    crebA_early_rep2 2022-12-14_scRNA_10x_3prime_CrebA_early2
-   crebA_rep2 2022-12-15_scRNA_10x_3prime_CrebA_late2
-   crebA_rep3 2022-12-16_scRNA_10x_3prime_CrebA_late3
-   crebA_rep4 2023-04-05_scRNA_10x_3prime_CrebA_late4
-   crebA_rep5 2023-06-20_scRNA_10x_3prime_CrebA_late5")
+   crebA_rep3 2022-12-16_scRNA_10x_3prime_CrebA_late3")
+
+# crebA_rep3 was ultimately the one that was used for late 
 
 SAMPLE = "all"
 source("R/set_up_environment.R")
