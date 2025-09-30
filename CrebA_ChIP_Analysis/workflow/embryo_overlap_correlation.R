@@ -25,7 +25,32 @@ down_genes[down_genes$MA_DE == 'True' & down_genes$SC_DE != 'True', 'type'] = 'M
 down_genes[down_genes$MA_DE != 'True' & down_genes$SC_DE == 'True', 'type'] = 'SC'
 
 down_genes = down_genes[is.na(down_genes$type) == FALSE, ]
+down_genes['broad_type'] = 'non-overlapping\n(MA or SC)'
+down_genes[down_genes$MA_DE == 'True' & down_genes$SC_DE == 'True', 'broad_type'] = 'overlapping\n(MA and SC)'
 
+##### plot out the broad category ##### 
+p = ggplot(down_genes, aes(x = broad_type, y = early_embryo_exp)) + 
+  geom_boxplot() + 
+  theme_cowplot() + 
+  xlab('CrebA activated genes') + 
+  ylab("Early embryo expression") + 
+  stat_compare_means(method = "wilcox.test", 
+                     comparisons = list(c("non-overlapping\n(MA or SC)", "overlapping\n(MA and SC)")), # replace with your x-axis group names
+                     label = "p.format")  # shows ***, **, etc.
+ggsave("../output/reviewer_comments/embryo_overlap_correlation/early_embryo_broad.png", width = 5, height = 4)
+
+p = ggplot(down_genes, aes(x = broad_type, y = late_embryo_exp)) + 
+  geom_boxplot() + 
+  theme_cowplot() +   
+  xlab('CrebA activated genes') + 
+  ylab("Late embryo expression") + 
+  stat_compare_means(method = "wilcox.test", 
+                     comparisons = list(c("non-overlapping\n(MA or SC)", "overlapping\n(MA and SC)")), # replace with your x-axis group names
+                     label = "p.format")  # shows ***, **, etc.
+ggsave("../output/reviewer_comments/embryo_overlap_correlation/late_embryo_borad.png", width = 5, height = 4)
+
+
+#### plot out the more fine cat #####
 p = ggplot(down_genes, aes(x = type, y = early_embryo_exp)) + 
   geom_boxplot() + 
   theme_cowplot() + 
