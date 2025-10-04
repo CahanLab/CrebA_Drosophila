@@ -8,4 +8,4 @@ The CLI tools used are below. You can also install them by installing the entire
 | tomtom      | 5.5.4.      |
 
 
-Before running the analysis code, please download the zip file from [here]() and unzip the content into a directory called `input`. 
+Before running the analysis code, please download the zip file from [here](https://cnobjects.s3.us-east-1.amazonaws.com/drosophila_2023/CrebA_Drosophila/input.zip) and unzip the content into a directory called `input`. 
