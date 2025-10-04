@@ -1,6 +1,6 @@
 ### Analysis for scRNA-seq
 
-- Current code: *main.R* calls our current analysis scripts in the correct order. You can find all the R scripts in `R/` folder. Before running the analysis, please download the zip file from [here]() and unzip the content into a directory called `accessory_data`.
+- Current code: *main.R* calls our current analysis scripts in the correct order. You can find all the R scripts in `R/` folder. Before running the analysis, please download the zip file from [here](https://cnobjects.s3.us-east-1.amazonaws.com/drosophila_2023/CrebA_Drosophila/accessory_data.zip) and unzip the content into a directory called `accessory_data`.
 
 Here are the packages required for the main analysis. 
 
